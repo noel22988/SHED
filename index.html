@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1A1A2E">
+<meta name="description" content="SHED - Drop the weight. Keep the fire. AI-powered weight loss tracker.">
+<title>SHED — Weight Loss Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23FF6B35' width='100' height='100' rx='20'/><text x='50' y='70' text-anchor='middle' font-size='60'>🔥</text></svg>">
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU0hFRCIsInNob3J0X25hbWUiOiJTSEVEIiwiZGVzY3JpcHRpb24iOiJEcm9wIHRoZSB3ZWlnaHQuIEtlZXAgdGhlIGZpcmUuIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxQTFBMkUiLCJ0aGVtZV9jb2xvciI6IiNGRjZCMzUifQ==">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--ember:#FF6B35;--flame:#FF9F1C;--coal:#1A1A2E;--smoke:#16213E;--ash:#0F3460;--glow:#E94560;--bone:#F8F0E3;--mist:#E8E0D4;--success:#2ECC71;--premium:#FFD700;--water:#3498DB;--cal:#E67E22;--step:#2ECC71;--sleep:#9B59B6}
+html,body,#root{height:100%;width:100%}
+body{font-family:'Sora',sans-serif;background:var(--coal);color:var(--bone);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.serif{font-family:'DM Serif Display',serif}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(255,107,53,0.3)}50%{box-shadow:0 0 40px rgba(255,107,53,0.6)}}
+@keyframes burn{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes dotPulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+.animate-up{animation:fadeUp .6s ease-out forwards}
+.animate-in{animation:fadeIn .5s ease-out forwards}
+.animate-glow{animation:glow 2s ease-in-out infinite}
+.animate-burn{background:linear-gradient(270deg,var(--ember),var(--flame),var(--glow),var(--ember));background-size:400% 400%;animation:burn 4s ease infinite}
+.btn-primary{background:linear-gradient(135deg,var(--ember),var(--flame));color:#fff;border:none;padding:14px 32px;border-radius:14px;font-family:'Sora',sans-serif;font-weight:600;font-size:15px;cursor:pointer;transition:all .3s;letter-spacing:.02em;width:100%}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,107,53,0.4)}
+.btn-primary:disabled{opacity:.4;transform:none;box-shadow:none;cursor:default}
+.btn-secondary{background:rgba(255,255,255,0.06);color:var(--bone);border:1px solid rgba(255,255,255,0.12);padding:14px 32px;border-radius:14px;font-family:'Sora',sans-serif;font-weight:500;font-size:15px;cursor:pointer;transition:all .3s}
+.btn-secondary:hover{background:rgba(255,255,255,0.1)}
+.input-field{width:100%;padding:14px 18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--bone);font-family:'Sora',sans-serif;font-size:15px;outline:none;transition:all .3s}
+.input-field:focus{border-color:var(--ember);box-shadow:0 0 0 3px rgba(255,107,53,0.15)}
+.input-field::placeholder{color:rgba(248,240,227,0.3)}
+textarea.input-field{resize:vertical}
+.card{background:linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:24px;transition:all .3s}
+.tag{display:inline-block;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:500;letter-spacing:.04em}
+.scrollbar-hide::-webkit-scrollbar{display:none}.scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
+.progress-ring{transform:rotate(-90deg)}
+select.input-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F8F0E3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.stepper-btn{width:56px;height:56px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--bone);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'Sora',sans-serif;font-weight:300;user-select:none}
+.stepper-btn:hover{background:rgba(255,255,255,0.08);border-color:var(--ember)}
+.stepper-btn:active{transform:scale(0.95)}
+/* Safe area for notched phones */
+@supports(padding-top: env(safe-area-inset-top)){body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback}=React;
+
+// ─── STORAGE ───
+const DB={
+  save(k,v){try{localStorage.setItem('shed_'+k,JSON.stringify(v))}catch(e){}},
+  load(k,d){try{const v=localStorage.getItem('shed_'+k);return v?JSON.parse(v):d}catch(e){return d}},
+  clear(){Object.keys(localStorage).filter(k=>k.startsWith('shed_')).forEach(k=>localStorage.removeItem(k))}
+};
+
+// ─── SVG ICONS ───
+const I={
+  flame:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>,
+  scale:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>,
+  target:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+  chart:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>,
+  food:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>,
+  bolt:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  trophy:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22M18 2H6v7a6 6 0 1012 0V2z"/></svg>,
+  home:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+  user:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+  bell:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>,
+  send:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
+  crown:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/></svg>,
+  x:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  back:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+  water:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>,
+  moon:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>,
+  sparkle:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill={c} stroke="none"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z"/><path d="M19 15L19.75 17.25L22 18L19.75 18.75L19 21L18.25 18.75L16 18L18.25 17.25L19 15Z" opacity="0.6"/></svg>,
+  edit:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+  ruler:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.3 15.3a2.4 2.4 0 010 3.4l-2.6 2.6a2.4 2.4 0 01-3.4 0L2.7 8.7a2.4 2.4 0 010-3.4l2.6-2.6a2.4 2.4 0 013.4 0z"/></svg>,
+  note:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
+  admin:(s=24,c="currentColor")=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
+};
+
+// ─── AI SERVICE (calls our /api/ai proxy) ───
+const AI={
+  async call(prompt){
+    try{
+      const r=await fetch('/api/ai',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:[{role:'user',content:prompt}]})
+      });
+      if(!r.ok) throw new Error('API error');
+      const d=await r.json();return d.content?.[0]?.text||null;
+    }catch(e){console.warn('AI call failed:',e);return null;}
+  },
+  async motivation(u){
+    return await this.call(`You are SHED, a fiery weight loss coach. User: ${u.name}, Current: ${u.cw}${u.unit}, Goal: ${u.gw}${u.unit}, Lost: ${u.lost}${u.unit}, Streak: ${u.streak} days. Give 2-3 sentences of bold, personalized motivation. Use their name.`)||`${u.name}, you've shed ${u.lost}${u.unit}. Every step forward proves you're unstoppable. 🔥`;
+  },
+  async meal(cals,prefs){
+    const t=await this.call(`Suggest a meal under ${cals} cal${prefs?`, prefs: ${prefs}`:''}. Return ONLY JSON: {"name":"Name","calories":N,"protein":"Xg","carbs":"Xg","fat":"Xg","description":"One sentence","ingredients":["a","b"]}`);
+    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:"Grilled Chicken Bowl",calories:420,protein:"35g",carbs:"45g",fat:"12g",description:"Lean protein with veggies and quinoa.",ingredients:["chicken","quinoa","greens","avocado"]}}
+  },
+  async workout(level,dur){
+    const t=await this.call(`Create a ${dur}-min ${level} fat-burning workout. Return ONLY JSON: {"name":"Name","duration":${dur},"calories_est":N,"exercises":[{"name":"Ex","reps":"12 reps","rest":"30 sec"}]} 4-6 exercises.`);
+    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:"Fat Blast",duration:dur,calories_est:250,exercises:[{name:"Jumping Jacks",reps:"45 sec",rest:"15 sec"},{name:"Squats",reps:"15 reps",rest:"30 sec"},{name:"Push-ups",reps:"10 reps",rest:"30 sec"},{name:"Mountain Climbers",reps:"30 sec",rest:"15 sec"},{name:"Plank",reps:"45 sec",rest:"30 sec"}]}}
+  },
+  async chat(msg,u){
+    return await this.call(`You are Blaze, AI coach in SHED weight loss app. Warm, direct. User: ${u.name}, Current: ${u.cw}${u.unit}, Goal: ${u.gw}${u.unit}, Lost: ${u.lost}${u.unit}. They say: "${msg}". Reply 2-4 sentences.`)||"I'm here for you! Let's keep pushing. 🔥";
+  },
+  async analyzeMeal(desc){
+    const t=await this.call(`Estimate nutrition for: "${desc}". Return ONLY JSON: {"name":"${desc}","calories":N,"protein":"Xg","carbs":"Xg","fat":"Xg"}`);
+    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:desc,calories:300,protein:"15g",carbs:"30g",fat:"10g"}}
+  }
+};
+
+// ─── COMPONENTS ───
+function ProgressRing({progress,size=120,stroke=8,color="var(--ember)"}){
+  const r=(size-stroke)/2,c=2*Math.PI*r,o=c-(Math.min(progress,100)/100)*c;
+  return <svg width={size} height={size} className="progress-ring"><circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={c} strokeDashoffset={o} strokeLinecap="round" style={{transition:"stroke-dashoffset 1s ease"}}/></svg>;
+}
+
+function MiniChart({data,width=260,height=80,color="var(--ember)"}){
+  if(!data||data.length<2)return null;
+  const mn=Math.min(...data)-2,mx=Math.max(...data)+2,rng=mx-mn||1;
+  const pts=data.map((v,i)=>`${(i/(data.length-1))*width},${height-((v-mn)/rng)*height}`).join(" ");
+  const gId='cg'+Math.random().toString(36).slice(2,6);
+  return <svg width="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" style={{overflow:"visible"}}><defs><linearGradient id={gId} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity="0.3"/><stop offset="100%" stopColor={color} stopOpacity="0"/></linearGradient></defs><polygon points={`0,${height} ${pts} ${width},${height}`} fill={`url(#${gId})`}/><polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx={width} cy={height-((data[data.length-1]-mn)/rng)*height} r="4" fill={color}/></svg>;
+}
+
+function Toast({message,onClose}){
+  useEffect(()=>{const t=setTimeout(onClose,3000);return()=>clearTimeout(t)},[]);
+  return <div style={{position:"fixed",top:20,left:"50%",transform:"translateX(-50%)",zIndex:9999,padding:"14px 28px",borderRadius:14,fontSize:14,fontWeight:500,animation:"fadeUp .4s ease-out",background:"linear-gradient(135deg,var(--ember),var(--flame))",color:"#fff",fontFamily:"'Sora'"}}>{message}</div>;
+}
+
+function BottomSheet({open,onClose,title,children}){
+  if(!open)return null;
+  return <div style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center"}}><div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.6)"}} onClick={onClose}/><div style={{position:"relative",width:"100%",maxWidth:480,background:"var(--smoke)",borderRadius:"24px 24px 0 0",padding:"28px 24px 36px",animation:"fadeUp .35s ease-out",maxHeight:"85vh",overflowY:"auto"}}><div style={{width:40,height:4,borderRadius:2,background:"rgba(255,255,255,0.15)",margin:"0 auto 20px"}}/><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>{title&&<h3 style={{fontSize:18,fontWeight:700}}>{title}</h3>}<button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",color:"var(--bone)",marginLeft:"auto"}}>{I.x(20)}</button></div>{children}</div></div>;
+}
+
+// ─── APP ───
+function ShedApp(){
+  const [screen,setScreen]=useState(()=>DB.load('profile',null)?'dashboard':'splash');
+  const [toast,setToast]=useState(null);
+  const [showNotifs,setShowNotifs]=useState(false);
+  const [isPremium,setIsPremium]=useState(()=>DB.load('premium',false));
+  const [obStep,setObStep]=useState(0);
+  const [profile,setProfile]=useState(()=>DB.load('profile',{name:"",currentWeight:"",goalWeight:"",unit:"kg",height:"",heightUnit:"cm",activityLevel:"moderate",motivation:""}));
+  const [weightHistory,setWeightHistory]=useState(()=>DB.load('weightHistory',[]));
+  const [dailyLog,setDailyLog]=useState(()=>{
+    const today=new Date().toDateString();
+    const saved=DB.load('dailyLog',null);
+    if(saved&&saved._date===today)return saved;
+    return{water:0,calories:0,steps:0,sleep:0,exercise:0,_date:today};
+  });
+  const [foodLog,setFoodLog]=useState(()=>DB.load('foodLog',[]));
+  const [measurements,setMeasurements]=useState(()=>DB.load('measurements',{waist:"",chest:"",hips:"",arms:"",thighs:""}));
+  const [streak]=useState(()=>DB.load('streak',1));
+  const [notes,setNotes]=useState(()=>DB.load('notes',''));
+  const [motivation,setMotivation]=useState("");
+  const [loadingMotivation,setLoadingMotivation]=useState(false);
+  const [mealSuggestion,setMealSuggestion]=useState(null);
+  const [loadingMeal,setLoadingMeal]=useState(false);
+  const [workout,setWorkout]=useState(null);
+  const [loadingWorkout,setLoadingWorkout]=useState(false);
+  const [chatMessages,setChatMessages]=useState(()=>DB.load('chatMessages',[]));
+  const [chatInput,setChatInput]=useState("");
+  const [chatLoading,setChatLoading]=useState(false);
+  const [modal,setModal]=useState(null);
+  const [mi,setMi]=useState({});
+  const [analyzingFood,setAnalyzingFood]=useState(false);
+
+  // Persist to localStorage
+  useEffect(()=>{if(profile.name)DB.save('profile',profile)},[profile]);
+  useEffect(()=>{if(weightHistory.length)DB.save('weightHistory',weightHistory)},[weightHistory]);
+  useEffect(()=>{DB.save('dailyLog',dailyLog)},[dailyLog]);
+  useEffect(()=>{DB.save('foodLog',foodLog)},[foodLog]);
+  useEffect(()=>{DB.save('measurements',measurements)},[measurements]);
+  useEffect(()=>{DB.save('notes',notes)},[notes]);
+  useEffect(()=>{DB.save('chatMessages',chatMessages)},[chatMessages]);
+  useEffect(()=>{DB.save('premium',isPremium)},[isPremium]);
+
+  const nav=useCallback((to)=>setScreen(to),[]);
+
+  useEffect(()=>{if(screen==="splash"){const t=setTimeout(()=>setScreen(DB.load('profile',null)&&DB.load('profile').name?'dashboard':'onboarding'),2500);return()=>clearTimeout(t)}},[screen]);
+  useEffect(()=>{if(screen==="dashboard"&&!motivation)loadMotivation()},[screen]);
+
+  const cw=parseFloat(profile.currentWeight)||0,gw=parseFloat(profile.goalWeight)||0;
+  const totalLost=weightHistory.length>1?Math.round((weightHistory[0]-weightHistory[weightHistory.length-1])*10)/10:0;
+  const progressPct=weightHistory.length>1&&gw?Math.min(100,Math.max(0,Math.round(((weightHistory[0]-weightHistory[weightHistory.length-1])/(weightHistory[0]-gw))*100))):0;
+  const userCtx={name:profile.name||"Champion",cw:profile.currentWeight,gw:profile.goalWeight,unit:profile.unit,lost:Math.abs(totalLost),streak};
+
+  const loadMotivation=async()=>{setLoadingMotivation(true);setMotivation(await AI.motivation(userCtx));setLoadingMotivation(false)};
+  const showToast=(m)=>setToast(m);
+
+  const notifs=[
+    {title:"Weigh-in Reminder",msg:"Time for your morning weigh-in!",time:"8:00 AM",icon:I.scale(18,"#FF6B35"),bg:"rgba(255,107,53,0.15)"},
+    {title:"Water Check 💧",msg:`You've had ${dailyLog.water} glasses today.`,time:"12:30 PM",icon:I.water(18,"#3498DB"),bg:"rgba(52,152,219,0.15)"},
+    {title:streak+"-Day Streak! 🔥",msg:"Don't break the chain!",time:"Yesterday",icon:I.flame(18,"#FF9F1C"),bg:"rgba(255,159,28,0.15)"},
+  ];
+
+  // SPLASH
+  if(screen==="splash")return(
+    <div style={{height:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"radial-gradient(ellipse at center,var(--smoke),var(--coal) 70%)",position:"relative"}}>
+      <div style={{position:"absolute",inset:0,background:"radial-gradient(circle at 50% 40%,rgba(255,107,53,0.08),transparent 60%)"}}/>
+      <div className="animate-glow" style={{width:100,height:100,borderRadius:28,background:"linear-gradient(135deg,var(--ember),var(--flame))",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:28}}>{I.flame(48,"white")}</div>
+      <h1 className="serif animate-up" style={{fontSize:52,background:"linear-gradient(135deg,var(--bone),var(--ember))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>SHED</h1>
+      <p className="animate-up" style={{fontSize:14,color:"rgba(248,240,227,0.5)",letterSpacing:"0.15em",textTransform:"uppercase",marginTop:8,animationDelay:"0.2s"}}>Drop the weight. Keep the fire.</p>
+    </div>
+  );
+
+  // ONBOARDING
+  const obSteps=[
+    {title:"What should we call you?",sub:"Let's make this personal.",content:<input className="input-field" placeholder="Your name" value={profile.name} onChange={e=>setProfile(p=>({...p,name:e.target.value}))} style={{fontSize:18,textAlign:"center",padding:18}}/>,valid:()=>profile.name.trim().length>0},
+    {title:"Where are you starting?",sub:"No judgment. Just honesty.",content:(
+      <div style={{display:"flex",flexDirection:"column",gap:16}}>
+        <div style={{display:"flex",gap:12}}><input className="input-field" type="number" placeholder="Current weight" value={profile.currentWeight} onChange={e=>setProfile(p=>({...p,currentWeight:e.target.value}))} style={{flex:1}}/><select className="input-field" value={profile.unit} onChange={e=>setProfile(p=>({...p,unit:e.target.value}))} style={{width:80}}><option value="kg">kg</option><option value="lbs">lbs</option></select></div>
+        <div style={{display:"flex",gap:12}}><input className="input-field" type="number" placeholder="Height" value={profile.height} onChange={e=>setProfile(p=>({...p,height:e.target.value}))} style={{flex:1}}/><select className="input-field" value={profile.heightUnit} onChange={e=>setProfile(p=>({...p,heightUnit:e.target.value}))} style={{width:80}}><option value="cm">cm</option><option value="ft">ft</option></select></div>
+      </div>),valid:()=>profile.currentWeight&&profile.height},
+    {title:"What's the target?",sub:"Dream big. Start now.",content:(
+      <div style={{display:"flex",flexDirection:"column",gap:16}}>
+        <div style={{display:"flex",gap:12,alignItems:"center"}}><input className="input-field" type="number" placeholder="Goal weight" value={profile.goalWeight} onChange={e=>setProfile(p=>({...p,goalWeight:e.target.value}))} style={{flex:1,fontSize:18,textAlign:"center"}}/><span style={{color:"rgba(248,240,227,0.5)"}}>{profile.unit}</span></div>
+        {profile.currentWeight&&profile.goalWeight&&<div className="card animate-up" style={{textAlign:"center",padding:20}}><p style={{fontSize:13,color:"rgba(248,240,227,0.5)",marginBottom:8}}>You want to shed</p><p className="serif" style={{fontSize:42,color:"var(--ember)"}}>{Math.abs(parseFloat(profile.currentWeight)-parseFloat(profile.goalWeight)).toFixed(1)}<span style={{fontSize:18,color:"rgba(248,240,227,0.5)"}}> {profile.unit}</span></p></div>}
+      </div>),valid:()=>profile.goalWeight},
+    {title:"How active are you?",sub:"Be honest.",content:(
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        {[{v:"sedentary",l:"Sedentary",d:"Desk job"},{v:"light",l:"Lightly Active",d:"Light walks"},{v:"moderate",l:"Moderately Active",d:"Exercise 3-4x/week"},{v:"active",l:"Very Active",d:"Intense 5-6x/week"}].map(lv=>(
+          <button key={lv.v} onClick={()=>setProfile(p=>({...p,activityLevel:lv.v}))} className="card" style={{textAlign:"left",cursor:"pointer",border:profile.activityLevel===lv.v?"2px solid var(--ember)":"1px solid rgba(255,255,255,0.06)",background:profile.activityLevel===lv.v?"rgba(255,107,53,0.06)":"transparent"}}><p style={{fontWeight:600}}>{lv.l}</p><p style={{fontSize:13,color:"rgba(248,240,227,0.5)",marginTop:4}}>{lv.d}</p></button>
+        ))}
+      </div>),valid:()=>true},
+  ];
+
+  if(screen==="onboarding"){
+    const s=obSteps[obStep];
+    return(
+      <div style={{maxWidth:480,margin:"0 auto",minHeight:"100vh",display:"flex",flexDirection:"column",background:"var(--coal)"}}>
+        <div style={{padding:"24px 24px 0"}}><div style={{display:"flex",gap:6,marginBottom:40}}>{obSteps.map((_,i)=><div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=obStep?"var(--ember)":"rgba(255,255,255,0.1)"}}/>)}</div></div>
+        <div className="animate-up" key={obStep} style={{flex:1,padding:"0 24px",display:"flex",flexDirection:"column"}}>
+          <h2 className="serif" style={{fontSize:32,lineHeight:1.2,marginBottom:8}}>{s.title}</h2>
+          <p style={{fontSize:15,color:"rgba(248,240,227,0.5)",marginBottom:36}}>{s.sub}</p>
+          <div style={{flex:1}}>{s.content}</div>
+        </div>
+        <div style={{padding:24,display:"flex",gap:12}}>
+          {obStep>0&&<button className="btn-secondary" onClick={()=>setObStep(s=>s-1)} style={{padding:"14px 24px",width:"auto"}}>{I.back(18)}</button>}
+          <button className="btn-primary" disabled={!s.valid()} onClick={()=>{
+            if(!s.valid())return;
+            if(obStep<obSteps.length-1){setObStep(s=>s+1)}
+            else{
+              const cw=parseFloat(profile.currentWeight);
+              if(weightHistory.length===0){const h=[];for(let i=6;i>=0;i--)h.push(Math.round((cw+i*0.2)*10)/10);h.push(cw);setWeightHistory(h)}
+              nav('dashboard');
+            }
+          }}>{obStep<obSteps.length-1?"Continue":"Start Shedding 🔥"}</button>
+        </div>
+      </div>
+    );
+  }
+
+  // CHAT
+  const chatRef=useRef(null);
+  useEffect(()=>{chatRef.current?.scrollIntoView({behavior:"smooth"})},[chatMessages]);
+  const sendChat=async()=>{
+    if(!chatInput.trim()||chatLoading)return;
+    const msg=chatInput.trim();setChatInput("");
+    setChatMessages(p=>[...p,{role:"user",text:msg}]);setChatLoading(true);
+    const reply=await AI.chat(msg,userCtx);
+    setChatMessages(p=>[...p,{role:"assistant",text:reply}]);setChatLoading(false);
+  };
+
+  // TABS
+  const tabs=[{id:"dashboard",label:"Home",icon:I.home},{id:"coach",label:"AI Coach",icon:I.sparkle},{id:"progress",label:"Progress",icon:I.chart},{id:"profile",label:"Profile",icon:I.user}];
+  const showTabs=["dashboard","coach","progress","profile"].includes(screen);
+
+  return(
+    <div style={{maxWidth:480,margin:"0 auto",minHeight:"100vh",background:"var(--coal)",position:"relative"}}>
+      {toast&&<Toast message={toast} onClose={()=>setToast(null)}/>}
+
+      {/* NOTIFS */}
+      {showNotifs&&<div style={{position:"fixed",inset:0,zIndex:100}}><div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.6)"}} onClick={()=>setShowNotifs(false)}/><div className="animate-up" style={{position:"relative",width:"100%",maxWidth:420,margin:"0 auto",background:"var(--coal)",borderRadius:"0 0 24px 24px",padding:24,maxHeight:"70vh",overflowY:"auto"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:20}}><h3 style={{fontSize:18,fontWeight:700}}>Notifications</h3><button onClick={()=>setShowNotifs(false)} style={{background:"none",border:"none",cursor:"pointer",color:"var(--bone)"}}>{I.x(20)}</button></div>{notifs.map((n,i)=>(<div key={i} className="card" style={{marginBottom:12,padding:16,opacity:0,animation:`fadeUp .4s ease ${i*0.1}s forwards`}}><div style={{display:"flex",gap:12}}><div style={{width:36,height:36,borderRadius:10,background:n.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{n.icon}</div><div><p style={{fontWeight:600,fontSize:14,marginBottom:4}}>{n.title}</p><p style={{fontSize:13,color:"rgba(248,240,227,0.6)",lineHeight:1.5}}>{n.msg}</p></div></div></div>))}</div></div>}
+
+      {/* ── MODALS ── */}
+      <BottomSheet open={modal==="water"} onClose={()=>setModal(null)} title="Log Water 💧">
+        <div style={{display:"flex",justifyContent:"center",gap:6,marginBottom:24}}>{Array.from({length:8}).map((_,i)=>(<div key={i} onClick={()=>setMi({water:i+1})} style={{width:34,height:48,borderRadius:10,background:i<(mi.water??dailyLog.water)?"rgba(52,152,219,0.25)":"rgba(255,255,255,0.04)",border:`1px solid ${i<(mi.water??dailyLog.water)?"rgba(52,152,219,0.5)":"rgba(255,255,255,0.08)"}`,cursor:"pointer",display:"flex",alignItems:"flex-end",justifyContent:"center",paddingBottom:6}}>{i<(mi.water??dailyLog.water)&&I.water(16,"#3498DB")}</div>))}</div>
+        <div style={{display:"flex",alignItems:"center",gap:20,justifyContent:"center",marginBottom:20}}><button className="stepper-btn" onClick={()=>setMi(p=>({water:Math.max(0,(p.water??dailyLog.water)-1)}))}>−</button><div><span className="serif" style={{fontSize:48,color:"#3498DB"}}>{mi.water??dailyLog.water}</span><span style={{fontSize:16,color:"rgba(248,240,227,0.4)",marginLeft:6}}>glasses</span></div><button className="stepper-btn" onClick={()=>setMi(p=>({water:Math.min(20,(p.water??dailyLog.water)+1)}))}>+</button></div>
+        <input className="input-field" type="number" placeholder="Or type exact..." onChange={e=>setMi({water:parseInt(e.target.value)||0})} style={{marginBottom:16}}/>
+        <button className="btn-primary" onClick={()=>{setDailyLog(p=>({...p,water:mi.water??p.water}));setModal(null);showToast(`Water: ${mi.water} glasses 💧`)}}>Save</button>
+      </BottomSheet>
+
+      <BottomSheet open={modal==="calories"} onClose={()=>setModal(null)} title="Log Calories 🍽️">
+        <div style={{display:"flex",alignItems:"center",gap:20,justifyContent:"center",marginBottom:20}}><button className="stepper-btn" onClick={()=>setMi(p=>({cal:Math.max(0,(p.cal??dailyLog.calories)-50)}))}>−</button><div style={{textAlign:"center"}}><span className="serif" style={{fontSize:48,color:"#E67E22"}}>{mi.cal??dailyLog.calories}</span><span style={{fontSize:16,color:"rgba(248,240,227,0.4)",marginLeft:6}}>kcal</span></div><button className="stepper-btn" onClick={()=>setMi(p=>({cal:(p.cal??dailyLog.calories)+50}))}>+</button></div>
+        <input className="input-field" type="number" placeholder="Type exact..." onChange={e=>setMi({cal:parseInt(e.target.value)||0})} style={{marginBottom:12}}/>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:16}}>{[{l:"Snack",c:150},{l:"Light",c:350},{l:"Full",c:600}].map(q=>(<button key={q.l} className="card" onClick={()=>setMi(p=>({cal:(p.cal??dailyLog.calories)+q.c}))} style={{cursor:"pointer",textAlign:"center",padding:14}}><p style={{fontSize:18,fontWeight:700,color:"#E67E22"}}>{q.c}</p><p style={{fontSize:11,color:"rgba(248,240,227,0.4)"}}>{q.l}</p></button>))}</div>
+        <button className="btn-primary" onClick={()=>{setDailyLog(p=>({...p,calories:mi.cal??p.calories}));setModal(null);showToast(`Calories: ${mi.cal} kcal`)}}>Save</button>
+      </BottomSheet>
+
+      <BottomSheet open={modal==="steps"} onClose={()=>setModal(null)} title="Log Steps 🚶">
+        <div style={{display:"flex",alignItems:"center",gap:20,justifyContent:"center",marginBottom:20}}><button className="stepper-btn" onClick={()=>setMi(p=>({steps:Math.max(0,(p.steps??dailyLog.steps)-500)}))}>−</button><div style={{textAlign:"center"}}><span className="serif" style={{fontSize:48,color:"#2ECC71"}}>{(mi.steps??dailyLog.steps).toLocaleString()}</span><span style={{fontSize:14,color:"rgba(248,240,227,0.4)",marginLeft:6}}>steps</span></div><button className="stepper-btn" onClick={()=>setMi(p=>({steps:(p.steps??dailyLog.steps)+500}))}>+</button></div>
+        <input className="input-field" type="number" placeholder="Type exact..." onChange={e=>setMi({steps:parseInt(e.target.value)||0})} style={{marginBottom:12}}/>
+        <div style={{display:"flex",gap:8,marginBottom:16}}>{[1000,2500,5000,10000].map(s=>(<button key={s} className="card" onClick={()=>setMi({steps:s})} style={{flex:1,cursor:"pointer",textAlign:"center",padding:12}}><p style={{fontSize:14,fontWeight:600,color:"#2ECC71"}}>{s>=1000?`${s/1000}k`:s}</p></button>))}</div>
+        <button className="btn-primary" onClick={()=>{setDailyLog(p=>({...p,steps:mi.steps??p.steps}));setModal(null);showToast(`Steps: ${mi.steps}`)}}>Save</button>
+      </BottomSheet>
+
+      <BottomSheet open={modal==="sleep"} onClose={()=>setModal(null)} title="Log Sleep 🌙">
+        <div style={{display:"flex",alignItems:"center",gap:20,justifyContent:"center",marginBottom:20}}><button className="stepper-btn" onClick={()=>setMi(p=>({sleep:Math.max(0,(p.sleep??dailyLog.sleep)-0.5)}))}>−</button><div style={{textAlign:"center"}}><span className="serif" style={{fontSize:48,color:"#9B59B6"}}>{(mi.sleep??dailyLog.sleep).toFixed(1)}</span><span style={{fontSize:16,color:"rgba(248,240,227,0.4)",marginLeft:6}}>hrs</span></div><button className="stepper-btn" onClick={()=>setMi(p=>({sleep:Math.min(24,(p.sleep??dailyLog.sleep)+0.5)}))}>+</button></div>
+        <p style={{fontSize:13,color:"rgba(248,240,227,0.4)",marginBottom:10}}>QUALITY</p>
+        <div style={{display:"flex",gap:8,marginBottom:16}}>{["😴 Poor","😐 Fair","😊 Good","🌟 Great"].map(q=>(<button key={q} onClick={()=>setMi(p=>({...p,sleepQ:q}))} className="card" style={{flex:1,cursor:"pointer",textAlign:"center",padding:10,fontSize:12,border:mi.sleepQ===q?"1px solid #9B59B6":"1px solid rgba(255,255,255,0.06)",background:mi.sleepQ===q?"rgba(155,89,182,0.1)":"transparent"}}>{q}</button>))}</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}><div><p style={{fontSize:12,color:"rgba(248,240,227,0.4)",marginBottom:6}}>Bedtime</p><input className="input-field" type="time" value={mi.bed||""} onChange={e=>setMi(p=>({...p,bed:e.target.value}))}/></div><div><p style={{fontSize:12,color:"rgba(248,240,227,0.4)",marginBottom:6}}>Wake</p><input className="input-field" type="time" value={mi.wake||""} onChange={e=>setMi(p=>({...p,wake:e.target.value}))}/></div></div>
+        <button className="btn-primary" onClick={()=>{setDailyLog(p=>({...p,sleep:mi.sleep??p.sleep}));setModal(null);showToast(`Sleep: ${(mi.sleep??dailyLog.sleep).toFixed(1)}hrs`)}}>Save</button>
+      </BottomSheet>
+
+      <BottomSheet open={modal==="food"} onClose={()=>setModal(null)} title="Log Food 🍎">
+        <p style={{fontSize:13,color:"rgba(248,240,227,0.5)",marginBottom:14}}>Describe what you ate — AI estimates nutrition.</p>
+        <textarea className="input-field" placeholder="e.g. 2 eggs, toast with butter, OJ" value={mi.foodDesc||""} onChange={e=>setMi(p=>({...p,foodDesc:e.target.value}))} style={{minHeight:80,marginBottom:12}}/>
+        <button className="btn-primary" disabled={!mi.foodDesc?.trim()||analyzingFood} onClick={async()=>{setAnalyzingFood(true);const r=await AI.analyzeMeal(mi.foodDesc);setAnalyzingFood(false);setFoodLog(p=>[...p,r]);setDailyLog(p=>({...p,calories:p.calories+r.calories}));setMi({});setModal(null);showToast(`Logged: ${r.name} (${r.calories} cal)`)}} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:20}}>{I.sparkle(16,"white")} {analyzingFood?"Analyzing...":"Analyze with AI"}</button>
+        <div style={{borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:20}}><p style={{fontSize:13,color:"rgba(248,240,227,0.4)",marginBottom:12}}>OR MANUALLY</p><input className="input-field" placeholder="Food name" style={{marginBottom:10}} value={mi.mName||""} onChange={e=>setMi(p=>({...p,mName:e.target.value}))}/><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}><input className="input-field" type="number" placeholder="Calories" value={mi.mCal||""} onChange={e=>setMi(p=>({...p,mCal:e.target.value}))}/><input className="input-field" type="number" placeholder="Protein(g)" value={mi.mPro||""} onChange={e=>setMi(p=>({...p,mPro:e.target.value}))}/><input className="input-field" type="number" placeholder="Carbs(g)" value={mi.mCarb||""} onChange={e=>setMi(p=>({...p,mCarb:e.target.value}))}/><input className="input-field" type="number" placeholder="Fat(g)" value={mi.mFat||""} onChange={e=>setMi(p=>({...p,mFat:e.target.value}))}/></div><button className="btn-secondary" style={{width:"100%"}} onClick={()=>{if(!mi.mName)return;const e={name:mi.mName,calories:parseInt(mi.mCal)||0,protein:(mi.mPro||0)+"g",carbs:(mi.mCarb||0)+"g",fat:(mi.mFat||0)+"g"};setFoodLog(p=>[...p,e]);setDailyLog(p=>({...p,calories:p.calories+e.calories}));setMi({});setModal(null);showToast("Logged: "+e.name)}}>Log Manually</button></div>
+      </BottomSheet>
+
+      <BottomSheet open={modal==="exercise"} onClose={()=>setModal(null)} title="Log Exercise 💪">
+        <input className="input-field" placeholder="Exercise (e.g. Running)" style={{marginBottom:12}} value={mi.exType||""} onChange={e=>setMi(p=>({...p,exType:e.target.value}))}/>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}><div><p style={{fontSize:12,color:"rgba(248,240,227,0.4)",marginBottom:6}}>Duration (min)</p><input className="input-field" type="number" placeholder="30" value={mi.exDur||""} onChange={e=>setMi(p=>({...p,exDur:e.target.value}))}/></div><div><p style={{fontSize:12,color:"rgba(248,240,227,0.4)",marginBottom:6}}>Cal burned</p><input className="input-field" type="number" placeholder="200" value={mi.exCal||""} onChange={e=>setMi(p=>({...p,exCal:e.target.value}))}/></div></div>
+        <p style={{fontSize:12,color:"rgba(248,240,227,0.4)",marginBottom:8}}>INTENSITY</p>
+        <div style={{display:"flex",gap:8,marginBottom:16}}>{["Light","Moderate","Intense"].map(lv=>(<button key={lv} onClick={()=>setMi(p=>({...p,exInt:lv}))} className="card" style={{flex:1,cursor:"pointer",textAlign:"center",padding:12,fontSize:13,border:mi.exInt===lv?"1px solid var(--flame)":"1px solid rgba(255,255,255,0.06)",background:mi.exInt===lv?"rgba(255,159,28,0.1)":"transparent"}}>{lv}</button>))}</div>
+        <button className="btn-primary" onClick={()=>{if(!mi.exType)return;setDailyLog(p=>({...p,exercise:p.exercise+(parseInt(mi.exCal)||0)}));setMi({});setModal(null);showToast("Logged: "+mi.exType+" 💪")}}>Log Exercise</button>
+      </BottomSheet>
+
+      <BottomSheet open={modal==="weight"} onClose={()=>setModal(null)} title="Log Weight ⚖️">
+        <div style={{textAlign:"center",marginBottom:8}}><ProgressRing progress={progressPct} size={140} stroke={8}/><p style={{marginTop:-40,marginBottom:24,fontSize:13,color:"rgba(248,240,227,0.4)"}}>{progressPct}% to goal</p></div>
+        <input className="input-field" type="number" step="0.1" placeholder={"Weight in "+profile.unit} value={mi.wt||""} onChange={e=>setMi({wt:e.target.value})} style={{fontSize:22,textAlign:"center",padding:18,marginBottom:12}}/>
+        <div style={{display:"flex",gap:8,marginBottom:16}}>{[-0.5,-0.1,0,0.1,0.5].map(d=>(<button key={d} onClick={()=>setMi({wt:String((cw+d).toFixed(1))})} className="card" style={{flex:1,cursor:"pointer",textAlign:"center",padding:10,fontSize:13}}>{d>0?"+":""}{d}</button>))}</div>
+        <button className="btn-primary" onClick={()=>{const v=parseFloat(mi.wt);if(isNaN(v))return;setWeightHistory(p=>[...p,v]);setProfile(p=>({...p,currentWeight:String(v)}));setMi({});setModal(null);showToast("Weight: "+v+profile.unit+" 🔥")}}>Log Weight 🔥</button>
+      </BottomSheet>
+
+      <BottomSheet open={modal==="measurement"} onClose={()=>setModal(null)} title="Measurements 📏">
+        {[{k:"waist",l:"Waist"},{k:"chest",l:"Chest"},{k:"hips",l:"Hips"},{k:"arms",l:"Arms"},{k:"thighs",l:"Thighs"}].map(m=>(<div key={m.k} style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}><span style={{fontSize:14,width:60,color:"rgba(248,240,227,0.6)"}}>{m.l}</span><input className="input-field" type="number" step="0.1" placeholder="cm" value={mi['m_'+m.k]??measurements[m.k]||""} onChange={e=>setMi(p=>({...p,['m_'+m.k]:e.target.value}))} style={{flex:1}}/></div>))}
+        <button className="btn-primary" style={{marginTop:8}} onClick={()=>{setMeasurements(p=>({...p,waist:mi.m_waist||p.waist,chest:mi.m_chest||p.chest,hips:mi.m_hips||p.hips,arms:mi.m_arms||p.arms,thighs:mi.m_thighs||p.thighs}));setMi({});setModal(null);showToast("Measurements saved! 📏")}}>Save</button>
+      </BottomSheet>
+
+      <BottomSheet open={modal==="notes"} onClose={()=>setModal(null)} title="Daily Notes 📝">
+        <textarea className="input-field" placeholder="How are you feeling?" style={{minHeight:140}} value={mi.notes??notes} onChange={e=>setMi({notes:e.target.value})}/>
+        <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:12}}>{["😊 Happy","😤 Motivated","😴 Tired","😋 Cravings","💪 Strong"].map(t=>(<button key={t} onClick={()=>setMi(p=>({notes:(p.notes||notes)+" "+t}))} className="tag" style={{cursor:"pointer",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>{t}</button>))}</div>
+        <button className="btn-primary" style={{marginTop:16}} onClick={()=>{setNotes(mi.notes||"");setMi({});setModal(null);showToast("Notes saved!")}}>Save</button>
+      </BottomSheet>
+
+      {/* ═══ DASHBOARD ═══ */}
+      {screen==="dashboard"&&(<div style={{paddingBottom:90}}>
+        <div style={{padding:"20px 20px 0",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><p style={{fontSize:13,color:"rgba(248,240,227,0.4)",letterSpacing:"0.08em"}}>GOOD {new Date().getHours()<12?"MORNING":new Date().getHours()<17?"AFTERNOON":"EVENING"}</p><h1 className="serif" style={{fontSize:28,marginTop:4}}>{profile.name}</h1></div><button onClick={()=>setShowNotifs(true)} style={{width:42,height:42,borderRadius:14,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",position:"relative"}}>{I.bell(20,"var(--bone)")}<div style={{position:"absolute",top:8,right:8,width:8,height:8,borderRadius:"50%",background:"var(--glow)"}}/></button></div>
+
+        <div style={{padding:"20px 20px 0"}}><div className="card animate-up" style={{background:"linear-gradient(135deg,rgba(255,107,53,0.08),rgba(255,159,28,0.04))",border:"1px solid rgba(255,107,53,0.15)",padding:20}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>{I.flame(20,"var(--ember)")}<span style={{fontSize:22,fontWeight:700,color:"var(--ember)"}}>{streak}</span><span style={{fontSize:13,color:"rgba(248,240,227,0.5)"}}>day streak</span><button onClick={loadMotivation} style={{marginLeft:"auto",background:"none",border:"none",cursor:"pointer",color:"var(--ember)",fontSize:12,fontFamily:"'Sora'",fontWeight:500,display:"flex",alignItems:"center",gap:4}}>{I.sparkle(14,"var(--ember)")} New</button></div>{loadingMotivation?<div style={{height:48}}><div style={{width:"70%",height:12,borderRadius:6,background:"linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.1),rgba(255,255,255,0.05))",backgroundSize:"200% 100%",animation:"shimmer 1.5s infinite"}}/></div>:<p style={{fontSize:14,lineHeight:1.7,color:"rgba(248,240,227,0.8)",fontStyle:"italic"}}>"{motivation||"Ready to shed? Your journey starts now."}"</p>}</div></div>
+
+        <div style={{padding:"16px 20px 0"}}><div className="card" style={{padding:24}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:20}}><div><p style={{fontSize:12,color:"rgba(248,240,227,0.4)",letterSpacing:"0.08em",marginBottom:6}}>CURRENT</p><p className="serif" style={{fontSize:38,lineHeight:1}}>{cw}<span style={{fontSize:16,color:"rgba(248,240,227,0.4)"}}> {profile.unit}</span></p></div><div style={{textAlign:"right"}}><p style={{fontSize:12,color:"rgba(248,240,227,0.4)",letterSpacing:"0.08em",marginBottom:6}}>TO GO</p><p className="serif" style={{fontSize:28,color:"var(--ember)"}}>{Math.abs(cw-gw).toFixed(1)}<span style={{fontSize:14,color:"rgba(248,240,227,0.4)"}}> {profile.unit}</span></p></div></div><MiniChart data={weightHistory} width={320} height={70}/><div style={{display:"flex",gap:12,marginTop:16}}><div style={{flex:1,padding:"12px 0",textAlign:"center",background:"rgba(46,204,113,0.06)",borderRadius:12,border:"1px solid rgba(46,204,113,0.12)"}}><p style={{fontSize:18,fontWeight:700,color:"var(--success)"}}>-{Math.abs(totalLost)}</p><p style={{fontSize:11,color:"rgba(248,240,227,0.4)"}}>Lost</p></div><div style={{flex:1,padding:"12px 0",textAlign:"center",background:"rgba(255,107,53,0.06)",borderRadius:12,border:"1px solid rgba(255,107,53,0.12)"}}><p style={{fontSize:18,fontWeight:700,color:"var(--ember)"}}>{progressPct}%</p><p style={{fontSize:11,color:"rgba(248,240,227,0.4)"}}>Progress</p></div></div><button onClick={()=>{setMi({});setModal("weight")}} className="btn-primary" style={{marginTop:16,padding:12,fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>{I.scale(16,"white")} Log Weight</button></div></div>
+
+        <div style={{padding:"16px 20px 0"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}><h3 style={{fontSize:14,fontWeight:600,color:"rgba(248,240,227,0.5)"}}>TODAY'S LOG</h3><button onClick={()=>{setMi({notes});setModal("notes")}} style={{background:"none",border:"none",cursor:"pointer",color:"rgba(248,240,227,0.4)",fontSize:12,fontFamily:"'Sora'",display:"flex",alignItems:"center",gap:4}}>{I.note(14)} Notes</button></div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>{[{key:"water",val:dailyLog.water,max:8,unit:"glasses",icon:I.water(18,"#3498DB"),color:"#3498DB"},{key:"calories",val:dailyLog.calories,max:2000,unit:"kcal",icon:I.food(18,"#E67E22"),color:"#E67E22"},{key:"steps",val:dailyLog.steps,max:10000,unit:"steps",icon:I.target(18,"#2ECC71"),color:"#2ECC71"},{key:"sleep",val:dailyLog.sleep,max:9,unit:"hrs",icon:I.moon(18,"#9B59B6"),color:"#9B59B6"}].map((item,i)=>(<button key={i} className="card" onClick={()=>{setMi({});setModal(item.key)}} style={{cursor:"pointer",padding:18,textAlign:"left",opacity:0,animation:`fadeUp .4s ease ${.15+i*.08}s forwards`}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>{item.icon}<span style={{fontSize:11,color:"rgba(248,240,227,0.3)"}}>{item.unit}</span></div><p style={{fontSize:24,fontWeight:700,color:item.color}}>{typeof item.val==='number'&&item.val%1!==0?item.val.toFixed(1):item.val}</p><div style={{marginTop:8,height:4,borderRadius:2,background:"rgba(255,255,255,0.06)"}}><div style={{height:"100%",borderRadius:2,background:item.color,width:Math.min(100,(item.val/item.max)*100)+"%",transition:"width .5s"}}/></div><p style={{fontSize:11,color:"rgba(248,240,227,0.25)",marginTop:6}}>Tap to edit</p></button>))}</div>
+        <div style={{display:"flex",gap:10,marginTop:12}}><button onClick={()=>{setMi({});setModal("food")}} className="card" style={{flex:1,cursor:"pointer",padding:16,display:"flex",alignItems:"center",gap:10}}>{I.food(18,"var(--ember)")}<div><p style={{fontWeight:600,fontSize:13}}>Log Food</p><p style={{fontSize:11,color:"rgba(248,240,227,0.4)"}}>AI analysis</p></div></button><button onClick={()=>{setMi({});setModal("exercise")}} className="card" style={{flex:1,cursor:"pointer",padding:16,display:"flex",alignItems:"center",gap:10}}>{I.bolt(18,"var(--flame)")}<div><p style={{fontWeight:600,fontSize:13}}>Exercise</p><p style={{fontSize:11,color:"rgba(248,240,227,0.4)"}}>Track burns</p></div></button></div>
+        <button onClick={()=>{setMi({});setModal("measurement")}} className="card" style={{width:"100%",cursor:"pointer",padding:16,display:"flex",alignItems:"center",gap:10,marginTop:10}}>{I.ruler(18,"#9B59B6")}<div><p style={{fontWeight:600,fontSize:13}}>Body Measurements</p><p style={{fontSize:11,color:"rgba(248,240,227,0.4)"}}>Waist, chest, hips, arms, thighs</p></div></button></div>
+
+        <div style={{padding:"20px 20px 0"}}><div style={{display:"flex",gap:10,overflowX:"auto"}} className="scrollbar-hide">{[{l:"AI Meals",icon:I.food(18,"white"),a:()=>nav("meals")},{l:"Workout",icon:I.bolt(18,"white"),a:()=>nav("workout")},{l:"Progress",icon:I.chart(18,"white"),a:()=>nav("progress")}].map((item,i)=>(<button key={i} onClick={item.a} style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",gap:10,padding:"16px 20px",borderRadius:16,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.06)",cursor:"pointer",minWidth:85}}><div style={{width:40,height:40,borderRadius:12,background:"linear-gradient(135deg,var(--ember),var(--flame))",display:"flex",alignItems:"center",justifyContent:"center"}}>{item.icon}</div><span style={{fontSize:12,color:"rgba(248,240,227,0.6)",fontFamily:"'Sora'",fontWeight:500}}>{item.l}</span></button>))}</div></div>
+
+        {foodLog.length>0&&<div style={{padding:"20px 20px 0"}}><h3 style={{fontSize:14,fontWeight:600,color:"rgba(248,240,227,0.5)",marginBottom:12}}>FOOD LOG</h3>{foodLog.map((f,i)=>(<div key={i} className="card" style={{padding:14,marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><p style={{fontWeight:600,fontSize:14}}>{f.name}</p><p style={{fontSize:12,color:"rgba(248,240,227,0.4)",marginTop:2}}>P:{f.protein} C:{f.carbs} F:{f.fat}</p></div><span className="tag" style={{background:"rgba(230,126,34,0.15)",color:"#E67E22"}}>{f.calories}cal</span></div>))}</div>}
+      </div>)}
+
+      {/* ═══ AI COACH ═══ */}
+      {screen==="coach"&&(<div style={{height:"100vh",display:"flex",flexDirection:"column"}}><div style={{padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,0.06)",display:"flex",alignItems:"center",gap:12}}><div style={{width:40,height:40,borderRadius:12,background:"linear-gradient(135deg,var(--ember),var(--flame))",display:"flex",alignItems:"center",justifyContent:"center"}}>{I.sparkle(20,"white")}</div><div style={{flex:1}}><p style={{fontWeight:600,fontSize:16}}>Blaze</p><p style={{fontSize:12,color:"rgba(248,240,227,0.4)"}}>AI Weight Loss Coach</p></div></div><div style={{flex:1,overflowY:"auto",padding:20}} className="scrollbar-hide">{chatMessages.length===0&&(<div style={{textAlign:"center",padding:"20px 10px"}}><div style={{width:64,height:64,borderRadius:20,background:"linear-gradient(135deg,var(--ember),var(--flame))",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>{I.sparkle(28,"white")}</div><h3 className="serif" style={{fontSize:22,marginBottom:8}}>Hey {profile.name}!</h3><p style={{color:"rgba(248,240,227,0.5)",fontSize:14,lineHeight:1.6,marginBottom:24}}>Ask me about nutrition, workouts, or motivation.</p><div style={{display:"flex",flexDirection:"column",gap:8}}>{["What should I eat today?","I'm craving junk food","Quick 10-min workout","How much protein do I need?","I hit a plateau"].map((q,i)=>(<button key={i} onClick={()=>setChatInput(q)} className="card" style={{cursor:"pointer",textAlign:"left",padding:14,fontSize:14}}>{q}</button>))}</div></div>)}{chatMessages.map((msg,i)=>(<div key={i} style={{display:"flex",justifyContent:msg.role==="user"?"flex-end":"flex-start",marginBottom:12}}>{msg.role==="assistant"&&<div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,var(--ember),var(--flame))",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginRight:8,marginTop:4}}>{I.sparkle(14,"white")}</div>}<div style={{maxWidth:"78%",padding:"12px 16px",borderRadius:msg.role==="user"?"16px 16px 4px 16px":"16px 16px 16px 4px",background:msg.role==="user"?"linear-gradient(135deg,var(--ember),var(--flame))":"rgba(255,255,255,0.06)",fontSize:14,lineHeight:1.6}}>{msg.text}</div></div>))}{chatLoading&&<div style={{display:"flex",alignItems:"center",gap:4,padding:12}}><div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,var(--ember),var(--flame))",display:"flex",alignItems:"center",justifyContent:"center",marginRight:8}}>{I.sparkle(14,"white")}</div>{[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:"var(--ember)",animation:`dotPulse 1.2s ease ${i*0.15}s infinite`}}/>)}</div>}<div ref={chatRef}/></div><div style={{padding:"12px 20px 90px",borderTop:"1px solid rgba(255,255,255,0.06)",display:"flex",gap:10}}><input className="input-field" placeholder="Ask Blaze anything..." value={chatInput} onChange={e=>setChatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&sendChat()} style={{flex:1}}/><button onClick={sendChat} disabled={!chatInput.trim()||chatLoading} style={{width:48,height:48,borderRadius:14,background:chatInput.trim()?"linear-gradient(135deg,var(--ember),var(--flame))":"rgba(255,255,255,0.05)",border:"none",cursor:chatInput.trim()?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center"}}>{I.send(18,"white")}</button></div></div>)}
+
+      {/* ═══ MEALS ═══ */}
+      {screen==="meals"&&(<div style={{minHeight:"100vh",padding:24,paddingBottom:100}}><button onClick={()=>nav("dashboard")} style={{background:"none",border:"none",cursor:"pointer",color:"var(--bone)",display:"flex",alignItems:"center",gap:8,marginBottom:24,fontFamily:"'Sora'",fontSize:14}}>{I.back(18)} Back</button><h2 className="serif" style={{fontSize:28,marginBottom:4}}>AI Meal Planner</h2><p style={{color:"rgba(248,240,227,0.5)",marginBottom:20,fontSize:14}}>Personalized meals with full macros</p><div style={{display:"flex",gap:10,marginBottom:16}}><input className="input-field" type="number" placeholder="Max cal" style={{flex:1}} value={mi.mealCal||""} onChange={e=>setMi(p=>({...p,mealCal:e.target.value}))}/><input className="input-field" placeholder="Preferences" style={{flex:1.5}} value={mi.mealPref||""} onChange={e=>setMi(p=>({...p,mealPref:e.target.value}))}/></div><button className="btn-primary" onClick={async()=>{setLoadingMeal(true);setMealSuggestion(await AI.meal(mi.mealCal||500,mi.mealPref));setLoadingMeal(false)}} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:24}}>{I.sparkle(16,"white")} {loadingMeal?"Generating...":"Generate Meal"}</button>{mealSuggestion&&(<div className="card animate-up" style={{padding:24,border:"1px solid rgba(255,107,53,0.15)",marginBottom:20}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:14}}><h3 style={{fontSize:18,fontWeight:700,flex:1}}>{mealSuggestion.name}</h3><span className="tag" style={{background:"rgba(46,204,113,0.15)",color:"#2ECC71",flexShrink:0}}>{mealSuggestion.calories} cal</span></div><p style={{fontSize:14,color:"rgba(248,240,227,0.7)",lineHeight:1.6,marginBottom:14}}>{mealSuggestion.description}</p><div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>{[{l:"Protein",v:mealSuggestion.protein},{l:"Carbs",v:mealSuggestion.carbs},{l:"Fat",v:mealSuggestion.fat}].filter(n=>n.v).map((n,i)=>(<span key={i} className="tag" style={{background:"rgba(255,107,53,0.1)",color:"var(--ember)"}}>{n.l}: {n.v}</span>))}</div><button onClick={()=>{setFoodLog(p=>[...p,mealSuggestion]);setDailyLog(p=>({...p,calories:p.calories+mealSuggestion.calories}));showToast("Added to food log")}} className="btn-secondary" style={{width:"100%"}}>Add to Log</button></div>)}<button onClick={()=>{setMi({});setModal("food")}} className="card" style={{width:"100%",cursor:"pointer",padding:20,display:"flex",alignItems:"center",gap:14}}>{I.edit(20,"var(--ember)")}<div><p style={{fontWeight:600}}>Log Custom Food</p><p style={{fontSize:12,color:"rgba(248,240,227,0.4)",marginTop:2}}>AI or manual</p></div></button></div>)}
+
+      {/* ═══ WORKOUT ═══ */}
+      {screen==="workout"&&(<div style={{minHeight:"100vh",padding:24,paddingBottom:100}}><button onClick={()=>nav("dashboard")} style={{background:"none",border:"none",cursor:"pointer",color:"var(--bone)",display:"flex",alignItems:"center",gap:8,marginBottom:24,fontFamily:"'Sora'",fontSize:14}}>{I.back(18)} Back</button><h2 className="serif" style={{fontSize:28,marginBottom:4}}>AI Workouts</h2><p style={{color:"rgba(248,240,227,0.5)",marginBottom:20,fontSize:14}}>Personalized fat-burning routines</p><div style={{display:"flex",gap:10,marginBottom:16}}><select className="input-field" value={mi.wkLvl||"moderate"} onChange={e=>setMi(p=>({...p,wkLvl:e.target.value}))}><option value="beginner">Beginner</option><option value="moderate">Moderate</option><option value="advanced">Advanced</option></select><select className="input-field" value={mi.wkDur||"20"} onChange={e=>setMi(p=>({...p,wkDur:e.target.value}))}><option value="10">10 min</option><option value="20">20 min</option><option value="30">30 min</option><option value="45">45 min</option></select></div><button className="btn-primary" onClick={async()=>{setLoadingWorkout(true);setWorkout(await AI.workout(mi.wkLvl||"moderate",parseInt(mi.wkDur)||20));setLoadingWorkout(false)}} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:24}}>{I.sparkle(16,"white")} {loadingWorkout?"Generating...":"Generate Workout"}</button>{workout&&<div className="animate-up"><div className="card" style={{padding:24,marginBottom:16,border:"1px solid rgba(255,107,53,0.15)"}}><h3 style={{fontSize:20,fontWeight:700,marginBottom:8}}>{workout.name}</h3><div style={{display:"flex",gap:12}}><span className="tag" style={{background:"rgba(255,107,53,0.1)",color:"var(--ember)"}}>{workout.duration} min</span><span className="tag" style={{background:"rgba(233,69,96,0.1)",color:"var(--glow)"}}>~{workout.calories_est} cal</span></div></div>{workout.exercises?.map((ex,i)=>(<div key={i} className="card" style={{marginBottom:10,padding:18,display:"flex",alignItems:"center",gap:16,opacity:0,animation:`fadeUp .4s ease ${i*.1}s forwards`}}><div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,var(--ember),var(--flame))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:"white",flexShrink:0}}>{i+1}</div><div style={{flex:1}}><p style={{fontWeight:600,fontSize:15}}>{ex.name}</p><p style={{fontSize:13,color:"rgba(248,240,227,0.5)",marginTop:2}}>{ex.reps} • Rest: {ex.rest}</p></div></div>))}<button onClick={()=>{setDailyLog(p=>({...p,exercise:p.exercise+(workout.calories_est||0)}));showToast("Workout logged! 🔥")}} className="btn-primary" style={{marginTop:16}}>Log This Workout</button></div>}</div>)}
+
+      {/* ═══ PROGRESS ═══ */}
+      {screen==="progress"&&(<div style={{minHeight:"100vh",padding:24,paddingBottom:100}}><h2 className="serif" style={{fontSize:28,marginBottom:24}}>Your Progress</h2><div className="card animate-up" style={{textAlign:"center",padding:32,marginBottom:16,background:"linear-gradient(135deg,rgba(46,204,113,0.06),rgba(255,107,53,0.04))"}}><p style={{fontSize:13,color:"rgba(248,240,227,0.4)",marginBottom:8}}>TOTAL SHED</p><p className="serif" style={{fontSize:56,color:"var(--success)",lineHeight:1}}>{Math.abs(totalLost)}<span style={{fontSize:20,color:"rgba(248,240,227,0.4)"}}> {profile.unit}</span></p><div style={{marginTop:20,height:8,borderRadius:4,background:"rgba(255,255,255,0.06)"}}><div className="animate-burn" style={{height:"100%",borderRadius:4,width:progressPct+"%"}}/></div><p style={{fontSize:13,color:"rgba(248,240,227,0.4)",marginTop:12}}>{progressPct}% to goal</p></div><div className="card" style={{padding:24,marginBottom:16}}><h3 style={{fontSize:14,fontWeight:600,color:"rgba(248,240,227,0.5)",marginBottom:16}}>WEIGHT TREND</h3><MiniChart data={weightHistory} width={300} height={100}/></div>{Object.values(measurements).some(v=>v)&&<div className="card" style={{padding:24,marginBottom:16}}><h3 style={{fontSize:14,fontWeight:600,color:"rgba(248,240,227,0.5)",marginBottom:14}}>MEASUREMENTS</h3>{[{k:"waist",l:"Waist"},{k:"chest",l:"Chest"},{k:"hips",l:"Hips"},{k:"arms",l:"Arms"},{k:"thighs",l:"Thighs"}].filter(m=>measurements[m.k]).map(m=>(<div key={m.k} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.04)"}}><span style={{color:"rgba(248,240,227,0.5)"}}>{m.l}</span><span style={{fontWeight:600}}>{measurements[m.k]} cm</span></div>))}</div>}<h3 style={{fontSize:14,fontWeight:600,color:"rgba(248,240,227,0.5)",marginBottom:12}}>ACHIEVEMENTS</h3><div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>{[{n:"First Step",d:"Log weight",i:I.flame(20,"#FF6B35"),done:weightHistory.length>0},{n:"Week Warrior",d:"7-day streak",i:I.bolt(20,"#FF9F1C"),done:streak>=7},{n:"Hydro Hero",d:"8 glasses",i:I.water(20,"#3498DB"),done:dailyLog.water>=8},{n:"5 Down",d:"Lose 5 units",i:I.trophy(20,"#2ECC71"),done:Math.abs(totalLost)>=5},{n:"10K Steps",d:"10,000 steps",i:I.target(20,"#E94560"),done:dailyLog.steps>=10000},{n:"Logger",d:"Log a meal",i:I.food(20,"#E67E22"),done:foodLog.length>0}].map((a,i)=>(<div key={i} className="card" style={{textAlign:"center",padding:16,opacity:a.done?1:.35}}><div style={{width:40,height:40,borderRadius:12,margin:"0 auto 8px",background:a.done?"rgba(255,107,53,0.1)":"rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"center"}}>{a.i}</div><p style={{fontSize:11,fontWeight:600}}>{a.n}</p><p style={{fontSize:10,color:"rgba(248,240,227,0.4)"}}>{a.d}</p></div>))}</div></div>)}
+
+      {/* ═══ PROFILE ═══ */}
+      {screen==="profile"&&(<div style={{minHeight:"100vh",padding:24,paddingBottom:100}}><h2 className="serif" style={{fontSize:28,marginBottom:24}}>Profile</h2><div className="card" style={{padding:24,marginBottom:16,display:"flex",alignItems:"center",gap:16}}><div style={{width:64,height:64,borderRadius:20,background:"linear-gradient(135deg,var(--ember),var(--flame))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,fontWeight:700}}>{(profile.name||"U")[0].toUpperCase()}</div><div><h3 style={{fontSize:18,fontWeight:700}}>{profile.name}</h3><p style={{fontSize:13,color:"rgba(248,240,227,0.5)"}}>Free Plan</p></div></div><div className="card" style={{marginBottom:16}}>{[{l:"Weight",v:profile.currentWeight+" "+profile.unit},{l:"Goal",v:profile.goalWeight+" "+profile.unit},{l:"Height",v:profile.height+" "+profile.heightUnit},{l:"Activity",v:profile.activityLevel}].map((it,i)=>(<div key={i} style={{display:"flex",justifyContent:"space-between",padding:"14px 0",borderBottom:i<3?"1px solid rgba(255,255,255,0.05)":"none"}}><span style={{fontSize:14,color:"rgba(248,240,227,0.5)"}}>{it.l}</span><span style={{fontSize:14,fontWeight:500}}>{it.v}</span></div>))}</div><button onClick={()=>{DB.clear();setScreen("splash");setProfile({name:"",currentWeight:"",goalWeight:"",unit:"kg",height:"",heightUnit:"cm",activityLevel:"moderate",motivation:""});setWeightHistory([]);setObStep(0);setMotivation("");setFoodLog([]);setDailyLog({water:0,calories:0,steps:0,sleep:0,exercise:0,_date:new Date().toDateString()});setChatMessages([])}} className="btn-secondary" style={{width:"100%",color:"var(--glow)"}}>Reset All Data</button></div>)}
+
+      {/* TAB BAR */}
+      {showTabs&&(<div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"rgba(26,26,46,0.95)",backdropFilter:"blur(20px)",borderTop:"1px solid rgba(255,255,255,0.06)",display:"flex",justifyContent:"space-around",padding:"8px 0 24px",maxWidth:480,margin:"0 auto"}}>{tabs.map(t=>(<button key={t.id} onClick={()=>nav(t.id)} style={{background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"8px 16px",color:screen===t.id?"var(--ember)":"rgba(248,240,227,0.3)"}}>{t.icon(22,screen===t.id?"var(--ember)":"rgba(248,240,227,0.3)")}<span style={{fontSize:10,fontWeight:screen===t.id?600:400,fontFamily:"'Sora'"}}>{t.label}</span></button>))}</div>)}
+    </div>
+  );
+}
+
+ReactDOM.render(<ShedApp/>,document.getElementById('root'));
+</script>
+</body>
+</html>
