@@ -52,7 +52,8 @@ const { useState, useEffect, useRef, useCallback } = React;
 const DB = {
   s(k,v){ try{ localStorage.setItem('sh_'+k, JSON.stringify(v)) }catch(e){} },
   l(k,d){ try{ const v=localStorage.getItem('sh_'+k); return v?JSON.parse(v):d }catch(e){return d} },
-  c(){ Object.keys(localStorage).filter(k=>k.startsWith('sh_')).forEach(k=>localStorage.removeItem(k)) }
+  c(){ Object.keys(localStorage).filter(k=>k.startsWith('sh_')).forEach(k=>localStorage.removeItem(k)) },
+  v(){ const ver='2'; if(localStorage.getItem('sh_ver')!==ver){this.c();localStorage.setItem('sh_ver',ver)} }
 };
 
 // ─── SVG Icon helper ───
@@ -156,6 +157,7 @@ function Sheet({open, onClose, title, children}){
 }
 
 // ─── MAIN APP ───
+DB.v();
 function App(){
   const hasProfile = DB.l('profile',null) && DB.l('profile',{}).name;
   const [scr, setScr] = useState(hasProfile ? 'dash' : 'splash');
@@ -264,7 +266,7 @@ function App(){
             if(ob<steps.length-1){setOb(o=>o+1)}
             else{
               const c=parseFloat(pro.currentWeight);
-              if(wh.length===0){const h=[];for(let i=6;i>=0;i--)h.push(Math.round((c+i*.2)*10)/10);h.push(c);setWh(h);}
+              if(wh.length===0){setWh([c]);}
               go('dash');
             }
           }}>{ob<steps.length-1?'Continue':'Start Shedding 🔥'}</button>
