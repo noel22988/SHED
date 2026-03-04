@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0F0F1A">
-<title>SHED</title>
+<meta name="theme-color" content="#1A1A2E">
+<title>SHED — Weight Loss Tracker</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
@@ -14,646 +14,505 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.4/babel.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--e:#FF6B35;--f:#FF9F1C;--c:#0F0F1A;--s:#1A1A2E;--g:#E94560;--b:#EEEBE6;--ok:#34D399;--w:#60A5FA;--cal:#FBBF24;--stp:#34D399;--slp:#A78BFA;--ex:#F87171;--sub:rgba(238,235,230,.5);--sub2:rgba(238,235,230,.3)}
+:root{--ember:#FF6B35;--flame:#FF9F1C;--coal:#12121F;--smoke:#16213E;--ash:#0F3460;--glow:#E94560;--bone:#EDEDED;--success:#2ECC71;--premium:#FFD700}
 html,body,#root{height:100%;width:100%}
-body{font-family:'Sora',sans-serif;background:var(--c);color:var(--b);overflow-x:hidden;-webkit-font-smoothing:antialiased}
-.sf{font-family:'DM Serif Display',serif}
-@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes gl{0%,100%{box-shadow:0 0 20px rgba(255,107,53,.2)}50%{box-shadow:0 0 40px rgba(255,107,53,.5)}}
-@keyframes dp{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
-.au{animation:fu .5s ease forwards}
-.ag{animation:gl 2s ease infinite}
-.btn{background:linear-gradient(135deg,var(--e),var(--f));color:#fff;border:none;padding:14px 28px;border-radius:14px;font-family:'Sora';font-weight:600;font-size:15px;cursor:pointer;width:100%;transition:all .2s;text-align:center}
-.btn:active{transform:scale(.97)}.btn:disabled{opacity:.35;cursor:default}
-.btn2{background:rgba(255,255,255,.06);color:var(--b);border:1px solid rgba(255,255,255,.1);padding:12px 24px;border-radius:14px;font-family:'Sora';font-weight:500;font-size:14px;cursor:pointer;width:100%}
-.inp{width:100%;padding:14px 18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;color:#fff;font-family:'Sora';font-size:15px;outline:none;transition:border .2s}
-.inp:focus{border-color:var(--e);box-shadow:0 0 0 3px rgba(255,107,53,.12)}
-.inp::placeholder{color:rgba(255,255,255,.3)}
-textarea.inp{resize:vertical}select.inp{appearance:none}
-.crd{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:20px}
-.tag{display:inline-block;padding:5px 12px;border-radius:100px;font-size:11px;font-weight:600}
-.ns::-webkit-scrollbar{display:none}.ns{-ms-overflow-style:none;scrollbar-width:none}
+body{font-family:'Sora',sans-serif;background:var(--coal);color:var(--bone);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.serif{font-family:'DM Serif Display',serif}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(255,107,53,0.3)}50%{box-shadow:0 0 40px rgba(255,107,53,0.6)}}
+@keyframes burn{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.au{animation:fadeUp .6s ease-out forwards}
+.ag{animation:glow 2s ease-in-out infinite}
+.aburn{background:linear-gradient(270deg,var(--ember),var(--flame),var(--glow),var(--ember));background-size:400% 400%;animation:burn 4s ease infinite}
+.bp{background:linear-gradient(135deg,var(--ember),var(--flame));color:#fff;border:none;padding:14px 32px;border-radius:14px;font-family:'Sora';font-weight:600;font-size:15px;cursor:pointer;width:100%;transition:all .3s}
+.bp:disabled{opacity:.4;cursor:default}
+.bs{background:rgba(255,255,255,.06);color:var(--bone);border:1px solid rgba(255,255,255,.12);padding:14px 32px;border-radius:14px;font-family:'Sora';font-weight:500;font-size:15px;cursor:pointer;width:100%}
+.inf{width:100%;padding:14px 18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#fff;font-family:'Sora';font-size:15px;outline:none;transition:border .3s}
+.inf:focus{border-color:var(--ember);box-shadow:0 0 0 3px rgba(255,107,53,.15)}
+.inf::placeholder{color:rgba(255,255,255,.35)}
+textarea.inf{resize:vertical}
+select.inf{appearance:none}
+.cd{background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:24px;transition:all .3s;color:#EDEDED}
+.tg{display:inline-block;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:500}
+.sbtn{width:56px;height:56px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--bone);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Sora';user-select:none}
+.noscroll::-webkit-scrollbar{display:none}.noscroll{-ms-overflow-style:none;scrollbar-width:none}
 @supports(padding-top:env(safe-area-inset-top)){body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}}
 </style>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-/* SHED V2 - Babel safe: no optional chaining, no nullish coalescing */
+<script id="app-code" type="text/babel" data-type="module">
+// ─── Use React globals ───
 function nn(a,b){return a!=null&&a!==undefined?a:b}
-var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef,useCallback=React.useCallback;
+const { useState, useEffect, useRef, useCallback } = React;
 
-/* STORAGE */
-var DB={
-  s:function(k,v){try{localStorage.setItem('sh2_'+k,JSON.stringify(v))}catch(e){}},
-  g:function(k,d){try{var v=localStorage.getItem('sh2_'+k);return v?JSON.parse(v):d}catch(e){return d}},
-  r:function(k){try{localStorage.removeItem('sh2_'+k)}catch(e){}},
-  clear:function(){var keys=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sh2_')===0)keys.push(k)}keys.forEach(function(k){localStorage.removeItem(k)})}
+// ─── STORAGE ───
+const DB = {
+  s(k,v){ try{ localStorage.setItem('sh_'+k, JSON.stringify(v)) }catch(e){} },
+  l(k,d){ try{ const v=localStorage.getItem('sh_'+k); return v?JSON.parse(v):d }catch(e){return d} },
+  c(){ Object.keys(localStorage).filter(k=>k.startsWith('sh_')).forEach(k=>localStorage.removeItem(k)) }
 };
 
-/* DATE HELPERS */
-var D={
-  key:function(d){var dt=d||new Date();return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')},
-  today:function(){return this.key(new Date())},
-  nice:function(d){return(d||new Date()).toLocaleDateString('en-SG',{weekday:'short',day:'numeric',month:'short'})},
-  greet:function(){var h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'},
-  monthDays:function(){var d=new Date(),y=d.getFullYear(),m=d.getMonth();var first=new Date(y,m,1).getDay();var total=new Date(y,m+1,0).getDate();var days=[];for(var i=0;i<first;i++)days.push(null);for(var j=1;j<=total;j++)days.push(D.key(new Date(y,m,j)));return days}
+// ─── SVG Icon helper ───
+function Ic({d, s=24, c="currentColor", f=false}){
+  return <svg width={s} height={s} viewBox="0 0 24 24" fill={f?c:"none"} stroke={f?"none":c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{__html:d}} />;
+}
+const P = {
+  flame: '<path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/>',
+  scale: '<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>',
+  target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  chart: '<path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>',
+  food: '<path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/>',
+  bolt: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  trophy: '<path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22M18 2H6v7a6 6 0 1012 0V2z"/>',
+  home: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  user: '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  bell: '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>',
+  send: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  crown: '<path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/>',
+  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  back: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  water: '<path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>',
+  moon: '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>',
+  sparkle: '<path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z"/><path d="M19 15L19.75 17.25L22 18L19.75 18.75L19 21L18.25 18.75L16 18L18.25 17.25L19 15Z" opacity="0.6"/>',
+  edit: '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  ruler: '<path d="M21.3 15.3a2.4 2.4 0 010 3.4l-2.6 2.6a2.4 2.4 0 01-3.4 0L2.7 8.7a2.4 2.4 0 010-3.4l2.6-2.6a2.4 2.4 0 013.4 0z"/>',
+  note: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
 };
 
-/* ICONS */
-function Ic(props){return React.createElement('svg',{width:props.s||22,height:props.s||22,viewBox:'0 0 24 24',fill:props.f?(props.c||'currentColor'):'none',stroke:props.f?'none':(props.c||'currentColor'),strokeWidth:'2',strokeLinecap:'round',strokeLinejoin:'round',dangerouslySetInnerHTML:{__html:props.d}})}
-var I={
-  flame:'<path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/>',
-  home:'<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
-  chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
-  chart:'<path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>',
-  user:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
-  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
-  back:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
-  water:'<path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>',
-  food:'<path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/>',
-  bolt:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  moon:'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>',
-  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
-  scale:'<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>',
-  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
-  trophy:'<path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22M18 2H6v7a6 6 0 1012 0V2z"/>',
-  ruler:'<path d="M21.3 15.3a2.4 2.4 0 010 3.4l-2.6 2.6a2.4 2.4 0 01-3.4 0L2.7 8.7a2.4 2.4 0 010-3.4l2.6-2.6a2.4 2.4 0 013.4 0z"/>',
-  plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
-  check:'<polyline points="20 6 9 17 4 12"/>'
-};
+// ─── AI ───
+const AI = {
+  // Build rich context snapshot from all user data
+  buildContext(pro, dl, fl, wh, meas, notes, streak){
+    const cw=parseFloat(pro.currentWeight)||0, gw=parseFloat(pro.goalWeight)||0;
+    const lost=wh.length>1?Math.round((wh[0]-wh[wh.length-1])*10)/10:0;
+    const pct=wh.length>1&&gw?Math.min(100,Math.max(0,Math.round(((wh[0]-wh[wh.length-1])/(wh[0]-gw))*100))):0;
+    const bmi=pro.height?Math.round(cw/Math.pow(parseFloat(pro.height)/100,2)*10)/10:null;
+    const lastWeighs=wh.slice(-7).map((w,i)=>w+(i<wh.length-1?'':'(latest)')).join(', ');
+    const tdee=Math.round((pro.activityLevel==='sedentary'?1.2:pro.activityLevel==='light'?1.375:pro.activityLevel==='moderate'?1.55:1.725)*(10*cw+6.25*(parseFloat(pro.height)||170)-5*35+5));
+    const deficit=Math.round(tdee*0.75);
 
-/* AI SERVICE */
-var AI={
-  buildCtx:function(pro,dl,fl,wh,meas,notes,streak,phase){
-    var cw=parseFloat(pro.currentWeight)||0,gw=parseFloat(pro.goalWeight)||0;
-    var lost=wh.length>1?Math.round((wh[0]-wh[wh.length-1])*10)/10:0;
-    var pct=wh.length>1&&gw?Math.min(100,Math.max(0,Math.round(((wh[0]-wh[wh.length-1])/(wh[0]-gw))*100))):0;
-    var bmi=pro.height?Math.round(cw/Math.pow(parseFloat(pro.height)/100,2)*10)/10:null;
-    var tdee=Math.round((pro.activityLevel==='sedentary'?1.2:pro.activityLevel==='light'?1.375:pro.activityLevel==='moderate'?1.55:1.725)*(10*cw+6.25*(parseFloat(pro.height)||170)-5*35+5));
-    var def=Math.round(tdee*0.75);
-    var c='## USER PROFILE\nName: '+pro.name+'\nCurrent: '+cw+pro.unit+' | Goal: '+gw+pro.unit+' | To lose: '+Math.abs(cw-gw).toFixed(1)+pro.unit+'\n';
-    c+='Height: '+(pro.height||'?')+nn(pro.heightUnit,'cm')+' | BMI: '+(bmi||'?')+' | Activity: '+pro.activityLevel+'\n';
-    c+='TDEE: ~'+tdee+' cal/day | Deficit target: ~'+def+' cal/day\n';
-    c+='Total lost: '+Math.abs(lost)+pro.unit+' ('+pct+'%) | Streak: '+streak+' days\n';
-    if(wh.length>1)c+='Recent weights: '+wh.slice(-7).join(', ')+'\n';
-    c+='\n## TODAY ('+D.nice()+')\nWater: '+dl.water+'/8 | Cal: '+dl.calories+'/'+def+' | Steps: '+dl.steps+'/10000 | Sleep: '+dl.sleep+'hrs | Exercise: '+dl.exercise+'cal\n';
-    if(fl.length>0){c+='\n## FOOD LOG\n';fl.forEach(function(f,i){c+=(i+1)+'. '+f.name+' '+f.calories+'cal\n'})}
-    if(phase)c+='\n## PHASE\n'+phase.name+': '+phase.focus+'\n';
-    if(meas&&(meas.waist||meas.chest))c+='\n## MEASUREMENTS\nWaist:'+nn(meas.waist,'?')+'cm Chest:'+nn(meas.chest,'?')+'cm\n';
-    if(notes)c+='\n## NOTES\n'+notes+'\n';
-    return c;
-  },
-  sysPrompt:function(ctx){
-    return 'You are Blaze, an elite AI weight loss coach in the SHED app. Warm, direct, evidence-based, deeply personal.\n\n'+
-    'PHILOSOPHY: Weight loss is a system. Celebrate small wins. Never shame. Be specific. Reference their data.\n\n'+
-    'KNOWLEDGE: Singapore food (hawker, kopitiam, zi char, nasi lemak, chicken rice, laksa, prata, mala, bubble tea). Accurate SG calorie estimates. CICO, macros, behavioral psychology.\n\n'+
-    'TALK-TO-LOG: When user mentions food/water/exercise/sleep/weight, extract data.\n'+
-    'End response with JSON on its own line:\n'+
-    '|||LOG|||{"water":2,"food":[{"name":"chicken rice","calories":650,"protein":"35g","carbs":"75g","fat":"18g"}],"steps":5000,"exercise":{"name":"walking","calories":150},"sleep":7,"weight":114.5}|||END|||\n'+
-    'Only include mentioned fields. Put |||LOG||| AFTER your chat response.\n'+
-    'If no loggable data, just respond normally without any LOG block.\n\n'+
-    'STYLE: 2-5 sentences. Name sometimes. ONE action item. SG food swaps. Emojis sparingly.\n\n'+
-    'DATA:\n'+ctx;
-  },
-  callHist:function(sys,msgs){
-    var apiMsgs=msgs.map(function(m){return{role:m.r==='u'?'user':'assistant',content:m.t}});
-    return fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,messages:apiMsgs})})
-    .then(function(r){if(!r.ok)return null;return r.json()})
-    .then(function(d){return d&&d.content&&d.content[0]&&d.content[0].text?d.content[0].text:null})
-    .catch(function(){return null});
-  },
-  call:function(prompt){
-    return fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}]})})
-    .then(function(r){if(!r.ok)return null;return r.json()})
-    .then(function(d){return d&&d.content&&d.content[0]&&d.content[0].text?d.content[0].text:null})
-    .catch(function(){return null});
-  },
-  motivation:function(ctx){
-    return this.call('You are Blaze. Data:\n'+ctx+'\nGive 2-3 sentences of personalized motivation. Reference actual numbers. Be warm and specific.');
-  },
-  weeklyReport:function(ctx){
-    return this.call('You are Blaze generating a WEEKLY REPORT. Data:\n'+ctx+'\n\nProvide: SUMMARY, WEIGHT trend, NUTRITION avg, WINS (2-3 things), FOCUS NEXT WEEK (1 goal), SCORE 1-10. Be encouraging but honest.');
-  }
-};
+    let ctx='## USER PROFILE\n';
+    ctx+='Name: '+pro.name+'\n';
+    ctx+='Current weight: '+cw+pro.unit+' | Goal: '+gw+pro.unit+' | To lose: '+Math.abs(cw-gw).toFixed(1)+pro.unit+'\n';
+    ctx+='Height: '+(pro.height||'?')+pro.heightUnit+' | BMI: '+(bmi||'?')+'\n';
+    ctx+='Activity level: '+pro.activityLevel+'\n';
+    ctx+='Estimated TDEE: ~'+tdee+' cal/day | Suggested deficit target: ~'+deficit+' cal/day\n';
+    ctx+='Total lost so far: '+Math.abs(lost)+pro.unit+' ('+pct+'% to goal)\n';
+    ctx+='Current streak: '+streak+' days\n';
+    ctx+='Motivation: '+(pro.motivation||'not specified')+'\n';
+    if(lastWeighs) ctx+='Recent weigh-ins: '+lastWeighs+'\n';
 
-/* SHED SCORE */
-function calcScore(dl,fl,logDays){
-  var s=0;
-  s+=Math.min(20,Math.round(dl.water*2.5));
-  s+=Math.min(20,fl.length*7);
-  if(dl.calories>=1200&&dl.calories<=2200)s+=15;else if(dl.calories>0)s+=5;
-  s+=Math.min(15,Math.round((dl.steps/10000)*15));
-  if(dl.sleep>=7&&dl.sleep<=9)s+=15;else if(dl.sleep>=5)s+=8;
-  if(dl.exercise>0)s+=10;
-  var yday=new Date();yday.setDate(yday.getDate()-1);
-  if(logDays&&logDays[D.key(yday)])s+=5;
-  return Math.min(100,s);
-}
+    ctx+='\n## TODAY\'S LOG ('+new Date().toLocaleDateString('en-SG',{weekday:'long',month:'short',day:'numeric'})+')\n';
+    ctx+='Water: '+dl.water+'/8 glasses\n';
+    ctx+='Calories consumed: '+dl.calories+' kcal'+(deficit?' (target: ~'+deficit+')':'')+'\n';
+    ctx+='Steps: '+dl.steps.toLocaleString()+'/10,000\n';
+    ctx+='Sleep: '+dl.sleep+' hours\n';
+    ctx+='Exercise calories burned: '+dl.exercise+' kcal\n';
 
-/* SMALL COMPONENTS */
-function Chart(props){
-  var data=props.data,w=280,h=nn(props.h,70),col=nn(props.col,'var(--e)');
-  if(!data||data.length<2)return null;
-  var mn=Math.min.apply(null,data)-1,mx=Math.max.apply(null,data)+1,rng=mx-mn||1;
-  var pts=data.map(function(v,i){return(i/(data.length-1))*w+','+(h-((v-mn)/rng)*h)}).join(' ');
-  var gid='cg'+Math.random().toString(36).slice(2,6);
-  return React.createElement('svg',{width:'100%',viewBox:'0 0 '+w+' '+h,preserveAspectRatio:'none',style:{overflow:'visible'}},
-    React.createElement('defs',null,React.createElement('linearGradient',{id:gid,x1:'0',y1:'0',x2:'0',y2:'1'},
-      React.createElement('stop',{offset:'0%',stopColor:col,stopOpacity:'0.25'}),
-      React.createElement('stop',{offset:'100%',stopColor:col,stopOpacity:'0'}))),
-    React.createElement('polygon',{points:'0,'+h+' '+pts+' '+w+','+h,fill:'url(#'+gid+')'}),
-    React.createElement('polyline',{points:pts,fill:'none',stroke:col,strokeWidth:'2.5',strokeLinecap:'round',strokeLinejoin:'round'}),
-    React.createElement('circle',{cx:w,cy:h-((data[data.length-1]-mn)/rng)*h,r:'4',fill:col}));
-}
-
-function Ring(props){
-  var p=props.p,sz=nn(props.sz,100),sw=nn(props.sw,8),col=nn(props.col,'var(--e)');
-  var r=(sz-sw)/2,c=2*Math.PI*r,o=c-(Math.min(p,100)/100)*c;
-  return React.createElement('svg',{width:sz,height:sz,style:{transform:'rotate(-90deg)'}},
-    React.createElement('circle',{cx:sz/2,cy:sz/2,r:r,fill:'none',stroke:'rgba(255,255,255,0.05)',strokeWidth:sw}),
-    React.createElement('circle',{cx:sz/2,cy:sz/2,r:r,fill:'none',stroke:col,strokeWidth:sw,strokeDasharray:c,strokeDashoffset:o,strokeLinecap:'round',style:{transition:'stroke-dashoffset .8s ease'}}));
-}
-
-function Toast(props){
-  useEffect(function(){var t=setTimeout(props.onClose,3000);return function(){clearTimeout(t)}},[]);
-  return React.createElement('div',{style:{position:'fixed',top:16,left:'50%',transform:'translateX(-50%)',zIndex:9999,padding:'12px 24px',borderRadius:14,fontSize:13,fontWeight:600,animation:'fu .3s',background:'linear-gradient(135deg,var(--e),var(--f))',color:'#fff',fontFamily:"'Sora'",maxWidth:'90%',textAlign:'center'}},props.msg);
-}
-
-function Sheet(props){
-  if(!props.open)return null;
-  return React.createElement('div',{style:{position:'fixed',inset:0,zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center'}},
-    React.createElement('div',{style:{position:'absolute',inset:0,background:'rgba(0,0,0,.6)'},onClick:props.onClose}),
-    React.createElement('div',{style:{position:'relative',width:'100%',maxWidth:480,background:'var(--s)',borderRadius:'24px 24px 0 0',padding:'24px 20px 36px',animation:'fu .3s',maxHeight:'85vh',overflowY:'auto'},className:'ns'},
-      React.createElement('div',{style:{width:36,height:4,borderRadius:2,background:'rgba(255,255,255,.12)',margin:'0 auto 16px'}}),
-      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}},
-        props.title&&React.createElement('h3',{style:{fontSize:17,fontWeight:700}},props.title),
-        React.createElement('button',{onClick:props.onClose,style:{background:'none',border:'none',cursor:'pointer',color:'var(--b)',marginLeft:'auto',padding:4}},React.createElement(Ic,{d:I.x,s:18}))),
-      props.children));
-}
-
-/* MAIN APP */
-function App(){
-  var hasProf=DB.g('pro',null)&&DB.g('pro',{}).name;
-  var _scr=useState(hasProf?'dash':'splash'),scr=_scr[0],setScr=_scr[1];
-  var _toast=useState(null),toast=_toast[0],setToast=_toast[1];
-  var _ob=useState(0),ob=_ob[0],setOb=_ob[1];
-  var _pro=useState(function(){return DB.g('pro',{name:'',currentWeight:'',goalWeight:'',unit:'kg',height:'',heightUnit:'cm',activityLevel:'moderate',motivation:''})}),pro=_pro[0],setPro=_pro[1];
-  var _wh=useState(function(){return DB.g('wh',[])}),wh=_wh[0],setWh=_wh[1];
-  var _dl=useState(function(){var t=D.today(),s=DB.g('dl',null);return s&&s._d===t?s:{water:0,calories:0,steps:0,sleep:0,exercise:0,_d:t}}),dl=_dl[0],setDl=_dl[1];
-  var _fl=useState(function(){return DB.g('fl_'+D.today(),[])}),fl=_fl[0],setFl=_fl[1];
-  var _meas=useState(function(){return DB.g('meas',{waist:'',chest:'',hips:'',arms:'',thighs:''})}),meas=_meas[0],setMeas=_meas[1];
-  var _logDays=useState(function(){return DB.g('logDays',{})}),logDays=_logDays[0],setLogDays=_logDays[1];
-  var _streak=useState(function(){return DB.g('streak',0)}),streak=_streak[0],setStreak=_streak[1];
-  var _notes=useState(function(){return DB.g('notes_'+D.today(),'')}),notes=_notes[0],setNotes=_notes[1];
-  var _msgs=useState(function(){return DB.g('msgs',[])}),msgs=_msgs[0],setMsgs=_msgs[1];
-  var _ci=useState(''),ci=_ci[0],setCi=_ci[1];
-  var _cL=useState(false),cL=_cL[0],setCL=_cL[1];
-  var _md=useState(null),md=_md[0],setMd=_md[1];
-  var _mi=useState({}),mi=_mi[0],setMi=_mi[1];
-  var _mot=useState(''),mot=_mot[0],setMot=_mot[1];
-  var _motL=useState(false),motL=_motL[0],setMotL=_motL[1];
-  var _favs=useState(function(){return DB.g('favs',[])}),favs=_favs[0],setFavs=_favs[1];
-  var _phase=useState(function(){return DB.g('phase',{name:'Phase 1: Build the Habit',week:1,focus:'Log daily, hit 6 glasses water, walk 5000 steps'})}),phase=_phase[0],setPhase=_phase[1];
-  var _wkR=useState(null),wkR=_wkR[0],setWkR=_wkR[1];
-  var _afL=useState(false),afL=_afL[0],setAfL=_afL[1];
-  var chatEnd=useRef(null);
-  var ciRef=useRef('');
-
-  /* Derived values - only recalculate when needed */
-  var cw=parseFloat(pro.currentWeight)||0,gw=parseFloat(pro.goalWeight)||0;
-  var lost=wh.length>1?Math.round((wh[0]-wh[wh.length-1])*10)/10:0;
-  var pct=wh.length>1&&gw?Math.min(100,Math.max(0,Math.round(((wh[0]-wh[wh.length-1])/(wh[0]-gw))*100))):0;
-  var score=calcScore(dl,fl,logDays);
-
-  /* Persist */
-  useEffect(function(){if(pro.name)DB.s('pro',pro)},[pro]);
-  useEffect(function(){if(wh.length)DB.s('wh',wh)},[wh]);
-  useEffect(function(){DB.s('dl',dl)},[dl]);
-  useEffect(function(){DB.s('fl_'+D.today(),fl)},[fl]);
-  useEffect(function(){DB.s('meas',meas)},[meas]);
-  useEffect(function(){DB.s('notes_'+D.today(),notes)},[notes]);
-  useEffect(function(){DB.s('msgs',msgs)},[msgs]);
-  useEffect(function(){DB.s('favs',favs)},[favs]);
-  useEffect(function(){DB.s('phase',phase)},[phase]);
-  useEffect(function(){DB.s('logDays',logDays)},[logDays]);
-  useEffect(function(){DB.s('streak',streak)},[streak]);
-
-  /* Mark today as logged */
-  useEffect(function(){
-    if(dl.water>0||dl.calories>0||dl.steps>0||dl.sleep>0||fl.length>0){
-      var ld=Object.assign({},logDays);ld[D.today()]=true;setLogDays(ld);
-      var s=1,d=new Date();d.setDate(d.getDate()-1);
-      while(ld[D.key(d)]){s++;d.setDate(d.getDate()-1)}
-      setStreak(s);
+    if(fl.length>0){
+      ctx+='\n## FOOD LOG TODAY\n';
+      fl.forEach(function(f,i){ctx+=(i+1)+'. '+f.name+' — '+f.calories+'cal (P:'+f.protein+' C:'+f.carbs+' F:'+f.fat+')\n'});
     }
-  },[dl.water,dl.calories,dl.steps,dl.sleep,fl.length]);
 
-  useEffect(function(){if(scr==='splash'){var t=setTimeout(function(){setScr(hasProf?'dash':'ob')},2000);return function(){clearTimeout(t)}}},[scr]);
-  useEffect(function(){if(scr==='dash'&&!mot)loadMot()},[scr]);
-  useEffect(function(){if(chatEnd.current)chatEnd.current.scrollIntoView({behavior:'smooth'})},[msgs]);
+    if(meas&&(meas.waist||meas.chest||meas.hips)){
+      ctx+='\n## BODY MEASUREMENTS\n';
+      if(meas.waist)ctx+='Waist: '+meas.waist+'cm | ';
+      if(meas.chest)ctx+='Chest: '+meas.chest+'cm | ';
+      if(meas.hips)ctx+='Hips: '+meas.hips+'cm | ';
+      if(meas.arms)ctx+='Arms: '+meas.arms+'cm | ';
+      if(meas.thighs)ctx+='Thighs: '+meas.thighs+'cm';
+      ctx+='\n';
+    }
 
-  var go=function(s){setScr(s)};
-  var tt=function(m){setToast(m)};
+    if(notes) ctx+='\n## USER\'S DAILY NOTES\n"'+notes+'"\n';
 
-  var loadMot=function(){
-    setMotL(true);
-    var ctx=AI.buildCtx(pro,dl,fl,wh,meas,notes,streak,phase);
-    AI.motivation(ctx).then(function(r){setMot(r||'Every day you show up is a win. Let\u0027s make today count! \uD83D\uDD25');setMotL(false)});
-  };
+    return ctx;
+  },
 
-  /* Parse talk-to-log data */
-  function parseLog(text){
-    var li=text.indexOf('|||LOG|||');
-    var ei=text.indexOf('|||END|||');
-    if(li===-1||ei===-1)return{chat:text,log:null};
-    var chat=text.substring(0,li).trim();
-    var json=text.substring(li+9,ei).trim();
-    try{return{chat:chat,log:JSON.parse(json)}}
-    catch(e){return{chat:text,log:null}}
-  }
+  // The master system prompt that makes Blaze world-class
+  systemPrompt(ctx){
+    return 'You are Blaze, an elite AI weight loss coach inside the SHED app. You are warm but direct, evidence-based, and deeply personal. You are the kind of coach people pay $200/hour for.\n\n'+
+    '## YOUR COACHING PHILOSOPHY\n'+
+    '- Weight loss is a SYSTEM, not willpower. Build sustainable habits.\n'+
+    '- Track patterns, not just numbers. Connect sleep, stress, food, and weight.\n'+
+    '- Celebrate small wins genuinely. A 0.1kg loss IS progress.\n'+
+    '- Never shame. Reframe setbacks as data points, not failures.\n'+
+    '- Be specific and actionable. Never give vague advice like "eat healthier."\n'+
+    '- When giving calorie/nutrition advice, use their TDEE and actual food log data.\n'+
+    '- Proactively notice things in their data (low water, skipped meals, sleep deficit, etc.)\n\n'+
+    '## YOUR KNOWLEDGE\n'+
+    '- You understand Singapore food culture deeply: hawker centres, kopitiams, zi char, mixed rice, mala, bubble tea, kaya toast, prata, nasi lemak, chicken rice, laksa, ban mian, etc.\n'+
+    '- You can estimate calories for local SG foods accurately.\n'+
+    '- You know that SG portions and food environments present unique challenges.\n'+
+    '- You understand the tropical climate (hydration needs are higher).\n'+
+    '- You are trained in evidence-based nutrition science, CICO, macros, metabolic adaptation, and behavioral psychology.\n'+
+    '- You understand that aggressive deficits lead to muscle loss and metabolic adaptation. A 500-750 cal deficit is ideal for sustainable loss.\n\n'+
+    '## RESPONSE STYLE\n'+
+    '- Keep responses conversational and warm, 2-5 sentences usually.\n'+
+    '- Use their name naturally (not every message).\n'+
+    '- Give ONE clear action item when possible.\n'+
+    '- Reference their actual data when possible.\n'+
+    '- Ask follow-up questions to understand their situation better.\n'+
+    '- Use emojis sparingly and naturally, not excessively.\n'+
+    '- If they share a struggle, validate first, then strategize.\n'+
+    '- If they share a win, celebrate genuinely, then build momentum.\n'+
+    '- Give specific SG-friendly food swaps when discussing nutrition (e.g. "swap the char kway teow for a thunder tea rice — similar satisfaction, half the calories")\n'+
+    '- When they ask about meals, consider what is practical and available in Singapore.\n\n'+
+    '## PROACTIVE COACHING\n'+
+    '- If water intake is low, mention it naturally.\n'+
+    '- If calories seem too low (<1200) or too high, flag it gently.\n'+
+    '- If sleep is under 6 hours, connect it to weight loss (cortisol, hunger hormones).\n'+
+    '- If there is no exercise logged, suggest something achievable.\n'+
+    '- If the person seems discouraged, shift focus to non-scale victories.\n'+
+    '- Track their weekly patterns and give end-of-day summaries when asked.\n\n'+
+    '## CURRENT USER DATA\n'+ctx+
+    '\n## IMPORTANT\n'+
+    '- Be their thinking partner, not just an answer machine.\n'+
+    '- Every response should make them feel seen, understood, and capable.\n'+
+    '- You are not a doctor. For medical concerns, recommend they see one.\n'+
+    '- Never recommend extreme diets, diet pills, or <1200 cal/day.\n'+
+    '- Adapt your tone to theirs — if they are casual, be casual. If serious, match it.';
+  },
 
-  /* Apply logged data */
-  function applyLog(log){
-    if(!log)return;
-    var updates=[];
-    if(log.water){setDl(function(p){return Object.assign({},p,{water:p.water+log.water})});updates.push('+'+log.water+' water')}
-    if(log.food&&log.food.length>0){
-      log.food.forEach(function(f){
-        setFl(function(p){return p.concat([f])});
-        setDl(function(p){return Object.assign({},p,{calories:p.calories+(f.calories||0)})});
-        var fname=f.name.toLowerCase();
-        setFavs(function(pf){
-          var exists=pf.some(function(x){return x.name.toLowerCase()===fname});
-          if(!exists&&pf.length<20)return pf.concat([f]);return pf;
-        });
+  async callWithHistory(systemPrompt, messages){
+    try {
+      const apiMsgs = messages.map(function(m){return {role:m.r==='u'?'user':'assistant',content:m.t}});
+      const r = await fetch('/api/ai',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({system:systemPrompt, messages:apiMsgs})
       });
-      updates.push(log.food.map(function(f){return f.name}).join(', '));
-    }
-    if(log.steps){setDl(function(p){return Object.assign({},p,{steps:p.steps+log.steps})});updates.push('+'+log.steps+' steps')}
-    if(log.exercise){setDl(function(p){return Object.assign({},p,{exercise:p.exercise+(log.exercise.calories||0)})});updates.push(nn(log.exercise.name,'exercise'))}
-    if(log.sleep){setDl(function(p){return Object.assign({},p,{sleep:log.sleep})});updates.push(log.sleep+'hrs sleep')}
-    if(log.weight){
-      setWh(function(p){return p.concat([log.weight])});
-      setPro(function(p){return Object.assign({},p,{currentWeight:String(log.weight)})});
-      updates.push(log.weight+pro.unit);
-    }
-    if(updates.length>0)tt('Logged: '+updates.join(' \u2022 '));
+      if(!r.ok){console.error('AI API error:',r.status);return null;}
+      const d = await r.json();
+      return d&&d.content&&d.content[0]&&d.content[0].text?d.content[0].text:null;
+    } catch(e){console.error('AI call failed:',e);return null;}
+  },
+
+  async call(prompt){
+    try {
+      const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}]})});
+      if(!r.ok){console.error('AI API error:',r.status,await r.text());return null;}
+      const d = await r.json();
+      return d&&d.content&&d.content[0]&&d.content[0].text?d.content[0].text:null;
+    } catch(e){console.error('AI call failed:',e);return null;}
+  },
+
+  async motivation(ctx){
+    return await this.call('You are Blaze, elite weight loss coach. Based on this data:\n\n'+ctx+'\n\nGive a personalized, specific motivational message in 2-3 sentences. Reference their actual numbers. Make them feel seen and fired up. If there is something to celebrate (streak, weight lost, good food choices), call it out. If there is something to improve (low water, no exercise), weave it in encouragingly. Be warm and real, not cheesy.')||'Every day you show up is a day you win. Let\'s make today count. 🔥';
+  },
+
+  async meal(cals,prefs,ctx){
+    const t=await this.call('You are a nutritionist in Singapore. Based on this user data:\n\n'+ctx+'\n\nSuggest a meal under '+cals+' cal'+(prefs?', preferences: '+prefs:'')+'. Prioritize meals easily available in Singapore (hawker, home-cooked, or grab-and-go). Return ONLY JSON: {"name":"Name","calories":0,"protein":"0g","carbs":"0g","fat":"0g","description":"Why this meal works for them specifically.","ingredients":["a","b"]}');
+    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:"Thunder Tea Rice",calories:380,protein:"18g",carbs:"52g",fat:"8g",description:"High fiber, low fat, packed with nutrients.",ingredients:["rice","vegetables","tofu","tea paste"]}}
+  },
+
+  async workout(level,dur,ctx){
+    const t=await this.call('You are a personal trainer. User data:\n\n'+ctx+'\n\nCreate a '+dur+'-min '+level+' fat-burning workout suitable for someone at their current weight. Exercises should be joint-friendly and doable at home or in a small space. Return ONLY JSON: {"name":"Name","duration":'+dur+',"calories_est":0,"exercises":[{"name":"Ex","reps":"12 reps or 30 sec","rest":"30 sec"}]} Include 4-6 exercises. Be specific with form cues in the exercise name if needed.');
+    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:"Home Fat Blast",duration:dur,calories_est:200,exercises:[{name:"March in Place (knees high)",reps:"60 sec",rest:"15 sec"},{name:"Wall Push-ups",reps:"12 reps",rest:"30 sec"},{name:"Chair Squats (sit to stand)",reps:"12 reps",rest:"30 sec"},{name:"Standing Side Bends",reps:"15 each side",rest:"20 sec"},{name:"Plank (or knee plank)",reps:"30 sec",rest:"30 sec"}]}}
+  },
+
+  async analyzeMeal(desc,ctx){
+    const t=await this.call('You are a Singapore-based nutritionist. Estimate nutrition for: "'+desc+'". Consider typical Singapore portions and preparation methods. If it is a local dish, use accurate local portion data. Return ONLY JSON: {"name":"'+desc+'","calories":0,"protein":"0g","carbs":"0g","fat":"0g"}');
+    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:desc,calories:300,protein:"15g",carbs:"30g",fat:"10g"}}
   }
+};
 
-  /* Send chat - uses ref for input to avoid re-render lag */
-  var sendChat=function(){
-    var val=ciRef.current||ci;
-    if(!val.trim()||cL)return;
-    var m=val.trim();setCi('');ciRef.current='';
-    var newMsgs=[].concat(msgs,[{r:'u',t:m}]);
-    setMsgs(newMsgs);setCL(true);
-    var ctx=AI.buildCtx(pro,dl,fl,wh,meas,notes,streak,phase);
-    var sys=AI.sysPrompt(ctx);
-    var hist=newMsgs.slice(-20);
-    AI.callHist(sys,hist).then(function(reply){
-      if(!reply)reply='Having trouble connecting. Try again! \uD83D\uDD25';
-      var parsed=parseLog(reply);
-      if(parsed.log)applyLog(parsed.log);
-      setMsgs(function(p){return p.concat([{r:'a',t:parsed.chat}])});
-      setCL(false);
-    });
-  };
-
-  var handleCiChange=function(e){var v=e.target.value;ciRef.current=v;setCi(v)};
-
-  /* ---- SPLASH ---- */
-  if(scr==='splash')return React.createElement('div',{style:{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'radial-gradient(ellipse at center,var(--s),var(--c) 70%)'}},
-    React.createElement('div',{className:'ag',style:{width:90,height:90,borderRadius:24,background:'linear-gradient(135deg,var(--e),var(--f))',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:24}},React.createElement(Ic,{d:I.flame,s:42,c:'white'})),
-    React.createElement('h1',{className:'sf au',style:{fontSize:48,color:'var(--b)'}},'SHED'),
-    React.createElement('p',{className:'au',style:{fontSize:13,color:'var(--sub2)',letterSpacing:'.15em',textTransform:'uppercase',marginTop:8,animationDelay:'.2s',opacity:0}},'Drop the weight. Keep the fire.'));
-
-  /* ---- ONBOARDING ---- */
-  if(scr==='ob'){
-    var steps=[
-      {t:"What\u0027s your name?",s:'Let\u0027s make this personal.',c:React.createElement('input',{className:'inp',placeholder:'Your name',value:pro.name,onChange:function(e){setPro(Object.assign({},pro,{name:e.target.value}))},style:{fontSize:18,textAlign:'center',padding:18}}),v:function(){return pro.name.trim().length>0}},
-      {t:'Starting point?',s:'No judgment. Just data.',c:React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:14}},
-        React.createElement('div',{style:{display:'flex',gap:10}},React.createElement('input',{className:'inp',type:'number',placeholder:'Current weight',value:pro.currentWeight,onChange:function(e){setPro(Object.assign({},pro,{currentWeight:e.target.value}))},style:{flex:1}}),React.createElement('select',{className:'inp',value:pro.unit,onChange:function(e){setPro(Object.assign({},pro,{unit:e.target.value}))},style:{width:80}},React.createElement('option',{value:'kg'},'kg'),React.createElement('option',{value:'lbs'},'lbs'))),
-        React.createElement('div',{style:{display:'flex',gap:10}},React.createElement('input',{className:'inp',type:'number',placeholder:'Height (cm)',value:pro.height,onChange:function(e){setPro(Object.assign({},pro,{height:e.target.value}))},style:{flex:1}}),React.createElement('select',{className:'inp',value:pro.heightUnit,onChange:function(e){setPro(Object.assign({},pro,{heightUnit:e.target.value}))},style:{width:80}},React.createElement('option',{value:'cm'},'cm'),React.createElement('option',{value:'ft'},'ft')))),v:function(){return pro.currentWeight&&pro.height}},
-      {t:'Your target?',s:'Dream big. We\u0027ll get there in phases.',c:React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:14}},
-        React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center'}},React.createElement('input',{className:'inp',type:'number',placeholder:'Goal weight',value:pro.goalWeight,onChange:function(e){setPro(Object.assign({},pro,{goalWeight:e.target.value}))},style:{flex:1,fontSize:18,textAlign:'center'}}),React.createElement('span',{style:{color:'var(--sub)'}},pro.unit)),
-        pro.currentWeight&&pro.goalWeight&&React.createElement('div',{className:'crd au',style:{textAlign:'center',padding:20,background:'rgba(255,107,53,.06)',border:'1px solid rgba(255,107,53,.15)'}},
-          React.createElement('p',{style:{fontSize:12,color:'var(--sub)',marginBottom:6}},'Total to shed'),
-          React.createElement('p',{className:'sf',style:{fontSize:40,color:'var(--e)'}},Math.abs(parseFloat(pro.currentWeight)-parseFloat(pro.goalWeight)).toFixed(1),React.createElement('span',{style:{fontSize:16,color:'var(--sub)'}},' '+pro.unit)))),v:function(){return pro.goalWeight}},
-      {t:'Activity level?',s:'Be honest.',c:React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
-        [{v:'sedentary',l:'Sedentary',d:'Desk life'},{v:'light',l:'Lightly Active',d:'Casual walks'},{v:'moderate',l:'Moderate',d:'Exercise 3-4x/week'},{v:'active',l:'Very Active',d:'Intense 5-6x/week'}].map(function(lv){
-          return React.createElement('button',{key:lv.v,onClick:function(){setPro(Object.assign({},pro,{activityLevel:lv.v}))},className:'crd',style:{textAlign:'left',cursor:'pointer',border:pro.activityLevel===lv.v?'2px solid var(--e)':'1px solid rgba(255,255,255,.07)',background:pro.activityLevel===lv.v?'rgba(255,107,53,.06)':'transparent'}},
-            React.createElement('p',{style:{fontWeight:600,fontSize:15}},lv.l),
-            React.createElement('p',{style:{fontSize:12,color:'var(--sub)',marginTop:3}},lv.d))})),v:function(){return true}}
-    ];
-    var st=steps[ob];
-    return React.createElement('div',{style:{maxWidth:480,margin:'0 auto',minHeight:'100vh',display:'flex',flexDirection:'column',background:'var(--c)'}},
-      React.createElement('div',{style:{padding:'20px 20px 0'}},React.createElement('div',{style:{display:'flex',gap:5,marginBottom:36}},steps.map(function(_,i){return React.createElement('div',{key:i,style:{flex:1,height:3,borderRadius:2,background:i<=ob?'var(--e)':'rgba(255,255,255,.08)'}})}))),
-      React.createElement('div',{className:'au',key:ob,style:{flex:1,padding:'0 20px',display:'flex',flexDirection:'column'}},
-        React.createElement('h2',{className:'sf',style:{fontSize:30,lineHeight:1.2,marginBottom:6}},st.t),
-        React.createElement('p',{style:{fontSize:14,color:'var(--sub)',marginBottom:32}},st.s),
-        React.createElement('div',{style:{flex:1}},st.c)),
-      React.createElement('div',{style:{padding:20,display:'flex',gap:10}},
-        ob>0&&React.createElement('button',{className:'btn2',onClick:function(){setOb(ob-1)},style:{padding:'14px 20px',width:'auto'}},React.createElement(Ic,{d:I.back,s:16})),
-        React.createElement('button',{className:'btn',disabled:!st.v(),onClick:function(){
-          if(!st.v())return;
-          if(ob<steps.length-1)setOb(ob+1);
-          else{if(wh.length===0)setWh([parseFloat(pro.currentWeight)]);go('dash')}
-        }},ob<steps.length-1?'Continue':'Start Shedding \uD83D\uDD25')));
-  }
-
-  /* ---- TAB BAR ---- */
-  var tabs=[{id:'dash',l:'Home',ic:I.home},{id:'coach',l:'Coach',ic:I.chat},{id:'prog',l:'Progress',ic:I.chart},{id:'prof',l:'Profile',ic:I.user}];
-  var showTabs=tabs.some(function(t){return t.id===scr});
-
-  function TabBar(){
-    return React.createElement('div',{style:{position:'fixed',bottom:0,left:0,right:0,zIndex:50,background:'rgba(15,15,26,.95)',backdropFilter:'blur(16px)',borderTop:'1px solid rgba(255,255,255,.06)',display:'flex',justifyContent:'space-around',padding:'6px 0 22px',maxWidth:480,margin:'0 auto'}},
-      tabs.map(function(t){var act=scr===t.id;return React.createElement('button',{key:t.id,onClick:function(){go(t.id)},style:{background:'none',border:'none',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'8px 16px',color:act?'var(--e)':'var(--sub2)',transition:'color .2s'}},
-        React.createElement(Ic,{d:t.ic,s:20,c:act?'var(--e)':'var(--sub2)'}),
-        React.createElement('span',{style:{fontSize:10,fontWeight:act?600:400,fontFamily:"'Sora'"}},t.l))}));
-  }
-
-  /* ---- DASHBOARD ---- */
-  function Dashboard(){
-    return React.createElement('div',{style:{paddingBottom:90}},
-      /* Header */
-      React.createElement('div',{style:{padding:'18px 20px 0',display:'flex',justifyContent:'space-between',alignItems:'center'}},
-        React.createElement('div',null,
-          React.createElement('p',{style:{fontSize:11,color:'var(--sub2)',letterSpacing:'.1em'}},D.greet().toUpperCase()),
-          React.createElement('h1',{className:'sf',style:{fontSize:26,marginTop:3}},pro.name)),
-        React.createElement('div',{style:{position:'relative'}},
-          React.createElement(Ring,{p:score,sz:48,sw:4,col:score>=70?'var(--ok)':score>=40?'var(--cal)':'var(--ex)'}),
-          React.createElement('span',{style:{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,color:score>=70?'var(--ok)':score>=40?'var(--cal)':'var(--ex)'}},score))),
-
-      /* Score + Streak */
-      React.createElement('div',{style:{padding:'14px 20px 0',display:'flex',gap:10}},
-        React.createElement('div',{className:'crd',style:{flex:1,padding:16,background:'rgba(255,107,53,.04)',border:'1px solid rgba(255,107,53,.1)'}},
-          React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',marginBottom:4}},'SHED SCORE'),
-          React.createElement('p',{className:'sf',style:{fontSize:30,color:score>=70?'var(--ok)':score>=40?'var(--cal)':'var(--ex)'}},score),
-          React.createElement('p',{style:{fontSize:10,color:'var(--sub2)'}},score>=80?'On fire!':score>=60?'Solid day':score>=40?'Keep going':'Get started')),
-        React.createElement('div',{className:'crd',style:{flex:1,padding:16}},
-          React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',marginBottom:4}},'STREAK'),
-          React.createElement('div',{style:{display:'flex',alignItems:'baseline',gap:4}},
-            React.createElement('p',{className:'sf',style:{fontSize:30,color:'var(--e)'}},streak),
-            React.createElement('span',{style:{fontSize:11,color:'var(--sub2)'}},'days')),
-          React.createElement('p',{style:{fontSize:10,color:'var(--sub2)'}},streak>=7?'Beast mode':streak>=3?'Building it':'Log daily'))),
-
-      /* Motivation */
-      React.createElement('div',{style:{padding:'12px 20px 0'}},
-        React.createElement('div',{className:'crd',style:{padding:16}},
-          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:10}},
-            React.createElement(Ic,{d:I.flame,s:14,c:'var(--e)'}),
-            React.createElement('span',{style:{fontSize:11,fontWeight:600,color:'var(--e)'}},'Blaze says'),
-            React.createElement('button',{onClick:loadMot,style:{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'var(--sub2)',fontSize:10,fontFamily:"'Sora'"}},'refresh')),
-          motL?React.createElement('div',{style:{height:36,background:'linear-gradient(90deg,rgba(255,255,255,.02),rgba(255,255,255,.05),rgba(255,255,255,.02))',backgroundSize:'200% 100%',animation:'sh 1.5s infinite',borderRadius:8}}):
-          React.createElement('p',{style:{fontSize:13,lineHeight:1.7,color:'var(--sub)',fontStyle:'italic'}},mot||'Loading...'))),
-
-      /* Quick Log */
-      React.createElement('div',{style:{padding:'14px 20px 0'}},
-        React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',letterSpacing:'.08em',marginBottom:10}},'QUICK LOG'),
-        React.createElement('div',{style:{display:'flex',gap:8}},
-          [{l:'+1 Water',ic:I.water,c:'var(--w)',fn:function(){setDl(function(p){return Object.assign({},p,{water:p.water+1})});tt('+1 glass \uD83D\uDCA7')}},
-           {l:'Log Food',ic:I.food,c:'var(--cal)',fn:function(){setMi({});setMd('food')}},
-           {l:'Exercise',ic:I.bolt,c:'var(--ex)',fn:function(){setMi({});setMd('exercise')}},
-           {l:'Weight',ic:I.scale,c:'var(--e)',fn:function(){setMi({});setMd('weight')}}
-          ].map(function(q,i){return React.createElement('button',{key:i,onClick:q.fn,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:7,padding:'12px 6px',borderRadius:14,background:'rgba(255,255,255,.03)',border:'1px solid rgba(255,255,255,.06)',cursor:'pointer'}},
-            React.createElement('div',{style:{width:34,height:34,borderRadius:10,background:'rgba(255,255,255,.04)',display:'flex',alignItems:'center',justifyContent:'center'}},React.createElement(Ic,{d:q.ic,s:16,c:q.c})),
-            React.createElement('span',{style:{fontSize:9,color:'var(--sub)',fontFamily:"'Sora'",fontWeight:500}},q.l))}))),
-
-      /* Today Stats */
-      React.createElement('div',{style:{padding:'14px 20px 0'}},
-        React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',letterSpacing:'.08em',marginBottom:10}},"TODAY"),
-        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
-          [{k:'water',v:dl.water,mx:8,u:'/8 glasses',c:'var(--w)',ic:I.water,m:'water'},
-           {k:'cal',v:dl.calories,mx:2000,u:' kcal',c:'var(--cal)',ic:I.food,m:'cal'},
-           {k:'steps',v:dl.steps,mx:10000,u:' steps',c:'var(--stp)',ic:I.target,m:'steps'},
-           {k:'sleep',v:dl.sleep,mx:9,u:' hrs',c:'var(--slp)',ic:I.moon,m:'sleep'}].map(function(item,i){
-            return React.createElement('button',{key:i,className:'crd',onClick:function(){setMi({});setMd(item.m)},style:{cursor:'pointer',padding:14,textAlign:'left',opacity:0,animation:'fu .4s ease '+(0.05+i*0.06)+'s forwards'}},
-              React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:6}},
-                React.createElement(Ic,{d:item.ic,s:14,c:item.c}),
-                React.createElement('span',{style:{fontSize:9,color:'var(--sub2)'}},item.u)),
-              React.createElement('p',{style:{fontSize:20,fontWeight:700,color:item.c}},item.v),
-              React.createElement('div',{style:{marginTop:6,height:3,borderRadius:2,background:'rgba(255,255,255,.04)'}},
-                React.createElement('div',{style:{height:'100%',borderRadius:2,background:item.c,width:Math.min(100,(item.v/item.mx)*100)+'%',transition:'width .4s'}})))}))),
-
-      /* Weight */
-      React.createElement('div',{style:{padding:'12px 20px 0'}},
-        React.createElement('div',{className:'crd',style:{padding:18}},
-          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:14}},
-            React.createElement('div',null,
-              React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',marginBottom:3}},'CURRENT'),
-              React.createElement('p',{className:'sf',style:{fontSize:30}},cw,React.createElement('span',{style:{fontSize:13,color:'var(--sub)'}},' '+pro.unit))),
-            React.createElement('div',{style:{textAlign:'right'}},
-              React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',marginBottom:3}},'TO GO'),
-              React.createElement('p',{className:'sf',style:{fontSize:22,color:'var(--e)'}},Math.abs(cw-gw).toFixed(1),React.createElement('span',{style:{fontSize:11,color:'var(--sub)'}},' '+pro.unit)))),
-          React.createElement(Chart,{data:wh,h:60}),
-          React.createElement('div',{style:{display:'flex',gap:8,marginTop:12}},
-            React.createElement('div',{style:{flex:1,padding:'8px 0',textAlign:'center',background:'rgba(52,211,153,.06)',borderRadius:10,border:'1px solid rgba(52,211,153,.1)'}},
-              React.createElement('p',{style:{fontSize:15,fontWeight:700,color:'var(--ok)'}},'-'+Math.abs(lost)),
-              React.createElement('p',{style:{fontSize:9,color:'var(--sub2)'}},'Lost')),
-            React.createElement('div',{style:{flex:1,padding:'8px 0',textAlign:'center',background:'rgba(255,107,53,.06)',borderRadius:10,border:'1px solid rgba(255,107,53,.1)'}},
-              React.createElement('p',{style:{fontSize:15,fontWeight:700,color:'var(--e)'}},pct+'%'),
-              React.createElement('p',{style:{fontSize:9,color:'var(--sub2)'}},'Progress'))))),
-
-      /* Favorites */
-      favs.length>0&&React.createElement('div',{style:{padding:'14px 20px 0'}},
-        React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',letterSpacing:'.08em',marginBottom:8}},'FAVORITES \u2014 TAP TO LOG'),
-        React.createElement('div',{style:{display:'flex',gap:8,overflowX:'auto',paddingBottom:4},className:'ns'},favs.slice(0,8).map(function(f,i){
-          return React.createElement('button',{key:i,onClick:function(){setFl(function(p){return p.concat([f])});setDl(function(p){return Object.assign({},p,{calories:p.calories+f.calories})});tt('Logged '+f.name+' \u2705')},style:{flexShrink:0,padding:'8px 14px',borderRadius:12,background:'rgba(255,255,255,.03)',border:'1px solid rgba(255,255,255,.06)',cursor:'pointer',textAlign:'left'}},
-            React.createElement('p',{style:{fontSize:11,fontWeight:600,whiteSpace:'nowrap'}},f.name),
-            React.createElement('p',{style:{fontSize:9,color:'var(--cal)'}},f.calories+'cal'))}))),
-
-      /* Food Log */
-      fl.length>0&&React.createElement('div',{style:{padding:'12px 20px 0'}},
-        React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',letterSpacing:'.08em',marginBottom:8}},'FOOD LOG'),
-        fl.map(function(f,i){return React.createElement('div',{key:i,className:'crd',style:{padding:10,marginBottom:5,display:'flex',justifyContent:'space-between',alignItems:'center'}},
-          React.createElement('div',null,
-            React.createElement('p',{style:{fontWeight:600,fontSize:12}},f.name),
-            React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',marginTop:2}},'P:'+nn(f.protein,'?')+' C:'+nn(f.carbs,'?')+' F:'+nn(f.fat,'?'))),
-          React.createElement('span',{className:'tag',style:{background:'rgba(251,191,36,.1)',color:'var(--cal)'}},f.calories+'cal'))})),
-
-      /* Phase */
-      React.createElement('div',{style:{padding:'14px 20px 0'}},
-        React.createElement('div',{className:'crd',style:{padding:14,background:'rgba(167,139,250,.04)',border:'1px solid rgba(167,139,250,.1)'}},
-          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}},
-            React.createElement('p',{style:{fontSize:11,fontWeight:600,color:'var(--slp)'}},phase.name),
-            React.createElement('span',{className:'tag',style:{background:'rgba(167,139,250,.12)',color:'var(--slp)'}},'Week '+nn(phase.week,1)+'/4')),
-          React.createElement('p',{style:{fontSize:12,color:'var(--sub)',lineHeight:1.5}},phase.focus)))
-    );
-  }
-
-  /* ---- COACH ---- */
-  function Coach(){
-    var starters=['Review my day so far','Had [food] for lunch','Drank 3 glasses water','Walked 30 min today','What should I eat next?','I feel stuck, coach me','Give me my weekly report'];
-    return React.createElement('div',{style:{height:'100vh',display:'flex',flexDirection:'column'}},
-      React.createElement('div',{style:{padding:'14px 20px',borderBottom:'1px solid rgba(255,255,255,.06)',display:'flex',alignItems:'center',gap:12}},
-        React.createElement('div',{style:{width:36,height:36,borderRadius:12,background:'linear-gradient(135deg,var(--e),var(--f))',display:'flex',alignItems:'center',justifyContent:'center'}},React.createElement(Ic,{d:I.star,s:16,c:'white',f:true})),
-        React.createElement('div',{style:{flex:1}},
-          React.createElement('p',{style:{fontWeight:600,fontSize:14}},'Blaze'),
-          React.createElement('p',{style:{fontSize:10,color:'var(--sub2)'}},'Talk to log \u2022 Full context \u2022 SG food smart')),
-        msgs.length>0&&React.createElement('button',{onClick:function(){setMsgs([]);DB.r('msgs')},style:{background:'none',border:'none',cursor:'pointer',color:'var(--sub2)',fontSize:10,fontFamily:"'Sora'"}},'Clear')),
-      React.createElement('div',{style:{flex:1,overflowY:'auto',padding:16},className:'ns'},
-        msgs.length===0&&React.createElement('div',{style:{textAlign:'center',padding:'16px 8px'}},
-          React.createElement('div',{style:{width:52,height:52,borderRadius:16,background:'linear-gradient(135deg,var(--e),var(--f))',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px'}},React.createElement(Ic,{d:I.star,s:22,c:'white',f:true})),
-          React.createElement('h3',{className:'sf',style:{fontSize:19,marginBottom:6}},'Hey '+pro.name+'!'),
-          React.createElement('p',{style:{color:'var(--sub)',fontSize:12,lineHeight:1.6,marginBottom:18}},'Tell me what you ate, drank, or did \u2014 I\u0027ll log it AND coach you.'),
-          React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:6}},starters.map(function(q,i){
-            return React.createElement('button',{key:i,onClick:function(){setCi(q);ciRef.current=q},className:'crd',style:{cursor:'pointer',textAlign:'left',padding:11,fontSize:12}},q)}))),
-        msgs.map(function(m,i){
-          return React.createElement('div',{key:i,style:{display:'flex',justifyContent:m.r==='u'?'flex-end':'flex-start',marginBottom:10}},
-            m.r==='a'&&React.createElement('div',{style:{width:24,height:24,borderRadius:7,background:'linear-gradient(135deg,var(--e),var(--f))',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginRight:8,marginTop:4}},React.createElement(Ic,{d:I.star,s:11,c:'white',f:true})),
-            React.createElement('div',{style:{maxWidth:'78%',padding:'10px 14px',borderRadius:m.r==='u'?'14px 14px 4px 14px':'14px 14px 14px 4px',background:m.r==='u'?'linear-gradient(135deg,var(--e),var(--f))':'rgba(255,255,255,.06)',fontSize:13,lineHeight:1.6,whiteSpace:'pre-wrap'}},m.t))}),
-        cL&&React.createElement('div',{style:{display:'flex',alignItems:'center',gap:5,padding:10}},
-          React.createElement('div',{style:{width:24,height:24,borderRadius:7,background:'linear-gradient(135deg,var(--e),var(--f))',display:'flex',alignItems:'center',justifyContent:'center',marginRight:8}},React.createElement(Ic,{d:I.star,s:11,c:'white',f:true})),
-          [0,1,2].map(function(j){return React.createElement('div',{key:j,style:{width:6,height:6,borderRadius:'50%',background:'var(--e)',animation:'dp 1.2s ease '+j*0.15+'s infinite'}})})),
-        React.createElement('div',{ref:chatEnd})),
-      React.createElement('div',{style:{padding:'10px 16px 86px',borderTop:'1px solid rgba(255,255,255,.06)',display:'flex',gap:8}},
-        React.createElement('input',{className:'inp',placeholder:'Tell Blaze anything...',value:ci,onChange:handleCiChange,onKeyDown:function(e){if(e.key==='Enter')sendChat()},style:{flex:1,padding:'12px 16px'}}),
-        React.createElement('button',{onClick:sendChat,disabled:!ci.trim()||cL,style:{width:44,height:44,borderRadius:12,background:ci.trim()?'linear-gradient(135deg,var(--e),var(--f))':'rgba(255,255,255,.04)',border:'none',cursor:ci.trim()?'pointer':'default',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},React.createElement(Ic,{d:I.send,s:16,c:'white'}))));
-  }
-
-  /* ---- PROGRESS ---- */
-  function Progress(){
-    var monthDays=D.monthDays();
-    var monthName=new Date().toLocaleDateString('en-SG',{month:'long',year:'numeric'});
-    return React.createElement('div',{style:{minHeight:'100vh',padding:20,paddingBottom:100}},
-      React.createElement('h2',{className:'sf',style:{fontSize:24,marginBottom:18}},'Your Progress'),
-      /* Total */
-      React.createElement('div',{className:'crd au',style:{textAlign:'center',padding:24,marginBottom:12,background:'rgba(52,211,153,.03)'}},
-        React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',marginBottom:4}},'TOTAL SHED'),
-        React.createElement('p',{className:'sf',style:{fontSize:44,color:'var(--ok)'}},Math.abs(lost),React.createElement('span',{style:{fontSize:16,color:'var(--sub)'}},' '+pro.unit)),
-        React.createElement('div',{style:{marginTop:14,height:5,borderRadius:3,background:'rgba(255,255,255,.04)'}},
-          React.createElement('div',{style:{height:'100%',borderRadius:3,background:'linear-gradient(90deg,var(--e),var(--f))',width:pct+'%',transition:'width .5s'}})),
-        React.createElement('p',{style:{fontSize:11,color:'var(--sub2)',marginTop:8}},pct+'% to goal')),
-      /* Weight chart */
-      React.createElement('div',{className:'crd',style:{padding:16,marginBottom:12}},
-        React.createElement('p',{style:{fontSize:11,fontWeight:600,color:'var(--sub)',marginBottom:12}},'WEIGHT TREND'),
-        React.createElement(Chart,{data:wh,h:80})),
-      /* Calendar */
-      React.createElement('div',{className:'crd',style:{padding:16,marginBottom:12}},
-        React.createElement('p',{style:{fontSize:11,fontWeight:600,color:'var(--sub)',marginBottom:12}},monthName.toUpperCase()+' \u2014 DON\u0027T BREAK THE CHAIN'),
-        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:3,marginBottom:6}},
-          ['S','M','T','W','T','F','S'].map(function(d,i){return React.createElement('div',{key:i,style:{textAlign:'center',fontSize:9,color:'var(--sub2)',padding:3}},d)})),
-        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:3}},
-          monthDays.map(function(day,i){
-            if(!day)return React.createElement('div',{key:'e'+i});
-            var isToday=day===D.today();
-            var logged=logDays[day];
-            var dayNum=parseInt(day.split('-')[2]);
-            return React.createElement('div',{key:day,style:{aspectRatio:'1',borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:isToday?700:400,background:logged?'rgba(255,107,53,.15)':isToday?'rgba(255,255,255,.06)':'transparent',border:isToday?'1px solid var(--e)':'1px solid transparent',color:logged?'var(--e)':isToday?'var(--b)':'var(--sub2)'}},dayNum)}))),
-      /* Weekly Report */
-      React.createElement('button',{className:'btn',onClick:function(){
-        setWkR('Generating...');
-        var ctx=AI.buildCtx(pro,dl,fl,wh,meas,notes,streak,phase);
-        AI.weeklyReport(ctx).then(function(r){setWkR(r||'Could not generate. Try again.')})
-      },style:{marginBottom:12,display:'flex',alignItems:'center',justifyContent:'center',gap:8}},React.createElement(Ic,{d:I.star,s:14,c:'white',f:true}),' Weekly Report'),
-      wkR&&React.createElement('div',{className:'crd',style:{padding:16,marginBottom:12,whiteSpace:'pre-wrap',fontSize:12,lineHeight:1.7,color:'var(--sub)'}},wkR),
-      /* Measurements */
-      React.createElement('button',{className:'btn2',onClick:function(){setMi({});setMd('meas')},style:{display:'flex',alignItems:'center',justifyContent:'center',gap:8}},React.createElement(Ic,{d:I.ruler,s:14}),' Body Measurements'));
-  }
-
-  /* ---- PROFILE ---- */
-  function Profile(){
-    return React.createElement('div',{style:{minHeight:'100vh',padding:20,paddingBottom:100}},
-      React.createElement('h2',{className:'sf',style:{fontSize:24,marginBottom:18}},'Profile'),
-      React.createElement('div',{className:'crd',style:{padding:18,marginBottom:12,display:'flex',alignItems:'center',gap:14}},
-        React.createElement('div',{style:{width:50,height:50,borderRadius:16,background:'linear-gradient(135deg,var(--e),var(--f))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,fontWeight:700,color:'#fff'}},(pro.name||'U')[0].toUpperCase()),
-        React.createElement('div',null,
-          React.createElement('h3',{style:{fontSize:16,fontWeight:700}},pro.name),
-          React.createElement('p',{style:{fontSize:11,color:'var(--sub)',marginTop:2}},'Score: '+score+' \u2022 '+streak+' day streak'))),
-      React.createElement('div',{className:'crd',style:{marginBottom:12}},
-        [{l:'Weight',v:pro.currentWeight+' '+pro.unit},{l:'Goal',v:pro.goalWeight+' '+pro.unit},{l:'Height',v:pro.height+' '+nn(pro.heightUnit,'cm')},{l:'Activity',v:pro.activityLevel},{l:'Phase',v:phase.name}].map(function(it,i){
-          return React.createElement('div',{key:i,style:{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:i<4?'1px solid rgba(255,255,255,.04)':'none'}},
-            React.createElement('span',{style:{fontSize:12,color:'var(--sub)'}},it.l),
-            React.createElement('span',{style:{fontSize:12,fontWeight:500}},it.v))})),
-      React.createElement('button',{onClick:function(){DB.clear();window.location.reload()},className:'btn2',style:{color:'var(--g)',borderColor:'rgba(233,69,96,.2)',marginTop:8}},'Reset All Data'));
-  }
-
-  /* ---- MODALS ---- */
-  function Modals(){
-    return React.createElement(React.Fragment,null,
-      /* Water */
-      React.createElement(Sheet,{open:md==='water',onClose:function(){setMd(null)},title:'Water'},
-        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:20,justifyContent:'center',margin:'16px 0'}},
-          React.createElement('button',{className:'btn2',onClick:function(){setMi({w:Math.max(0,nn(mi.w,dl.water)-1)})},style:{width:48,height:48,padding:0,borderRadius:14,fontSize:20}},'\u2212'),
-          React.createElement('span',{className:'sf',style:{fontSize:44,color:'var(--w)'}},nn(mi.w,dl.water)),
-          React.createElement('button',{className:'btn2',onClick:function(){setMi({w:Math.min(20,nn(mi.w,dl.water)+1)})},style:{width:48,height:48,padding:0,borderRadius:14,fontSize:20}},'+')),
-        React.createElement('button',{className:'btn',onClick:function(){setDl(function(p){return Object.assign({},p,{water:nn(mi.w,p.water)})});setMd(null);tt('Water: '+nn(mi.w,dl.water)+' glasses')}},'Save')),
-      /* Calories */
-      React.createElement(Sheet,{open:md==='cal',onClose:function(){setMd(null)},title:'Calories'},
-        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:20,justifyContent:'center',margin:'16px 0'}},
-          React.createElement('button',{className:'btn2',onClick:function(){setMi({cal:Math.max(0,nn(mi.cal,dl.calories)-50)})},style:{width:48,height:48,padding:0,borderRadius:14,fontSize:20}},'\u2212'),
-          React.createElement('span',{className:'sf',style:{fontSize:36,color:'var(--cal)'}},nn(mi.cal,dl.calories)),
-          React.createElement('button',{className:'btn2',onClick:function(){setMi({cal:nn(mi.cal,dl.calories)+50})},style:{width:48,height:48,padding:0,borderRadius:14,fontSize:20}},'+')),
-        React.createElement('button',{className:'btn',onClick:function(){setDl(function(p){return Object.assign({},p,{calories:nn(mi.cal,p.calories)})});setMd(null);tt('Calories updated')}},'Save')),
-      /* Steps */
-      React.createElement(Sheet,{open:md==='steps',onClose:function(){setMd(null)},title:'Steps'},
-        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:20,justifyContent:'center',margin:'16px 0'}},
-          React.createElement('button',{className:'btn2',onClick:function(){setMi({st:Math.max(0,nn(mi.st,dl.steps)-500)})},style:{width:48,height:48,padding:0,borderRadius:14,fontSize:20}},'\u2212'),
-          React.createElement('span',{className:'sf',style:{fontSize:36,color:'var(--stp)'}},nn(mi.st,dl.steps)),
-          React.createElement('button',{className:'btn2',onClick:function(){setMi({st:nn(mi.st,dl.steps)+500})},style:{width:48,height:48,padding:0,borderRadius:14,fontSize:20}},'+')),
-        React.createElement('button',{className:'btn',onClick:function(){setDl(function(p){return Object.assign({},p,{steps:nn(mi.st,p.steps)})});setMd(null);tt('Steps saved')}},'Save')),
-      /* Sleep */
-      React.createElement(Sheet,{open:md==='sleep',onClose:function(){setMd(null)},title:'Sleep'},
-        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:20,justifyContent:'center',margin:'16px 0'}},
-          React.createElement('button',{className:'btn2',onClick:function(){setMi({sl:Math.max(0,nn(mi.sl,dl.sleep)-.5)})},style:{width:48,height:48,padding:0,borderRadius:14,fontSize:20}},'\u2212'),
-          React.createElement('span',{className:'sf',style:{fontSize:44,color:'var(--slp)'}},nn(mi.sl,dl.sleep).toFixed(1)),
-          React.createElement('button',{className:'btn2',onClick:function(){setMi({sl:Math.min(24,nn(mi.sl,dl.sleep)+.5)})},style:{width:48,height:48,padding:0,borderRadius:14,fontSize:20}},'+')),
-        React.createElement('button',{className:'btn',onClick:function(){setDl(function(p){return Object.assign({},p,{sleep:nn(mi.sl,p.sleep)})});setMd(null);tt('Sleep logged')}},'Save')),
-      /* Food */
-      React.createElement(Sheet,{open:md==='food',onClose:function(){setMd(null)},title:'Log Food'},
-        React.createElement('p',{style:{fontSize:11,color:'var(--sub)',marginBottom:10}},'Describe what you ate \u2014 AI estimates.'),
-        React.createElement('textarea',{className:'inp',placeholder:'e.g. chicken rice, milo peng',value:nn(mi.fd,''),onChange:function(e){setMi(Object.assign({},mi,{fd:e.target.value}))},style:{minHeight:60,marginBottom:10}}),
-        React.createElement('button',{className:'btn',disabled:!mi.fd||afL,onClick:function(){
-          setAfL(true);
-          AI.call('Singapore nutritionist. Estimate: "'+mi.fd+'". SG portions. Return ONLY JSON: {"name":"'+mi.fd+'","calories":0,"protein":"0g","carbs":"0g","fat":"0g"}')
-          .then(function(t){setAfL(false);var r;try{r=JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch(e){r={name:mi.fd,calories:300,protein:'15g',carbs:'30g',fat:'10g'}}setFl(function(p){return p.concat([r])});setDl(function(p){return Object.assign({},p,{calories:p.calories+r.calories})});var fn=r.name.toLowerCase();setFavs(function(pf){var exists=pf.some(function(x){return x.name.toLowerCase()===fn});if(!exists&&pf.length<20)return pf.concat([r]);return pf});setMi({});setMd(null);tt('Logged: '+r.name+' ('+r.calories+'cal)')})
-        },style:{marginBottom:14}},afL?'Analyzing...':'\u2728 Analyze with AI'),
-        React.createElement('div',{style:{borderTop:'1px solid rgba(255,255,255,.06)',paddingTop:12}},
-          React.createElement('p',{style:{fontSize:10,color:'var(--sub2)',marginBottom:8}},'MANUAL ENTRY'),
-          React.createElement('input',{className:'inp',placeholder:'Food name',style:{marginBottom:6},value:nn(mi.mn,''),onChange:function(e){setMi(Object.assign({},mi,{mn:e.target.value}))}}),
-          React.createElement('div',{style:{display:'flex',gap:6,marginBottom:8}},
-            React.createElement('input',{className:'inp',type:'number',placeholder:'Calories',value:nn(mi.mc,''),onChange:function(e){setMi(Object.assign({},mi,{mc:e.target.value}))},style:{flex:1}}),
-            React.createElement('input',{className:'inp',type:'number',placeholder:'Protein(g)',value:nn(mi.mp,''),onChange:function(e){setMi(Object.assign({},mi,{mp:e.target.value}))},style:{flex:1}})),
-          React.createElement('button',{className:'btn2',onClick:function(){if(!mi.mn)return;var entry={name:mi.mn,calories:parseInt(mi.mc)||0,protein:(nn(mi.mp,0))+'g',carbs:'0g',fat:'0g'};setFl(function(p){return p.concat([entry])});setDl(function(p){return Object.assign({},p,{calories:p.calories+entry.calories})});setMi({});setMd(null);tt('Logged: '+entry.name)}},'Log Manually'))),
-      /* Exercise */
-      React.createElement(Sheet,{open:md==='exercise',onClose:function(){setMd(null)},title:'Exercise'},
-        React.createElement('input',{className:'inp',placeholder:'What did you do?',style:{marginBottom:8},value:nn(mi.et,''),onChange:function(e){setMi(Object.assign({},mi,{et:e.target.value}))}}),
-        React.createElement('div',{style:{display:'flex',gap:8,marginBottom:8}},
-          React.createElement('input',{className:'inp',type:'number',placeholder:'Minutes',value:nn(mi.ed,''),onChange:function(e){setMi(Object.assign({},mi,{ed:e.target.value}))},style:{flex:1}}),
-          React.createElement('input',{className:'inp',type:'number',placeholder:'Cal burned',value:nn(mi.ec,''),onChange:function(e){setMi(Object.assign({},mi,{ec:e.target.value}))},style:{flex:1}})),
-        React.createElement('button',{className:'btn',onClick:function(){if(!mi.et)return;setDl(function(p){return Object.assign({},p,{exercise:p.exercise+(parseInt(mi.ec)||0)})});setMi({});setMd(null);tt('Logged: '+mi.et+' \uD83D\uDCAA')}},'Log Exercise')),
-      /* Weight */
-      React.createElement(Sheet,{open:md==='weight',onClose:function(){setMd(null)},title:'Log Weight'},
-        React.createElement('input',{className:'inp',type:'number',step:'0.1',placeholder:'Weight in '+pro.unit,value:nn(mi.wt,''),onChange:function(e){setMi({wt:e.target.value})},style:{fontSize:22,textAlign:'center',padding:18,marginBottom:10}}),
-        React.createElement('button',{className:'btn',onClick:function(){var v=parseFloat(mi.wt);if(isNaN(v))return;setWh(function(p){return p.concat([v])});setPro(function(p){return Object.assign({},p,{currentWeight:String(v)})});setMi({});setMd(null);tt('Weight: '+v+pro.unit)}},'Log Weight')),
-      /* Measurements */
-      React.createElement(Sheet,{open:md==='meas',onClose:function(){setMd(null)},title:'Measurements'},
-        [{k:'waist',l:'Waist'},{k:'chest',l:'Chest'},{k:'hips',l:'Hips'},{k:'arms',l:'Arms'},{k:'thighs',l:'Thighs'}].map(function(m){
-          return React.createElement('div',{key:m.k,style:{display:'flex',alignItems:'center',gap:10,marginBottom:8}},
-            React.createElement('span',{style:{fontSize:12,width:55,color:'var(--sub)'}},m.l),
-            React.createElement('input',{className:'inp',type:'number',step:'0.1',placeholder:'cm',value:nn(mi['m_'+m.k],meas[m.k])||'',onChange:function(e){var u={};u['m_'+m.k]=e.target.value;setMi(Object.assign({},mi,u))},style:{flex:1}}))}),
-        React.createElement('button',{className:'btn',style:{marginTop:6},onClick:function(){
-          setMeas(Object.assign({},meas,{waist:nn(mi.m_waist,meas.waist),chest:nn(mi.m_chest,meas.chest),hips:nn(mi.m_hips,meas.hips),arms:nn(mi.m_arms,meas.arms),thighs:nn(mi.m_thighs,meas.thighs)}));
-          setMi({});setMd(null);tt('Saved!')}},'Save'))
-    );
-  }
-
-  /* ---- RENDER ---- */
-  return React.createElement('div',{style:{maxWidth:480,margin:'0 auto',minHeight:'100vh',background:'var(--c)',position:'relative'}},
-    toast&&React.createElement(Toast,{msg:toast,onClose:function(){setToast(null)}}),
-    React.createElement(Modals,null),
-    scr==='dash'&&React.createElement(Dashboard,null),
-    scr==='coach'&&React.createElement(Coach,null),
-    scr==='prog'&&React.createElement(Progress,null),
-    scr==='prof'&&React.createElement(Profile,null),
-    showTabs&&React.createElement(TabBar,null));
+// ─── Small Components ───
+function MiniChart({data, width=260, height=80, color="var(--ember)"}){
+  if(!data||data.length<2) return null;
+  const mn=Math.min(...data)-2, mx=Math.max(...data)+2, rng=mx-mn||1;
+  const pts=data.map((v,i)=> (i/(data.length-1))*width+','+(height-((v-mn)/rng)*height) ).join(' ');
+  const gid='g'+Math.random().toString(36).slice(2,6);
+  return (
+    <svg width="100%" viewBox={'0 0 '+width+' '+height} preserveAspectRatio="none" style={{overflow:'visible'}}>
+      <defs><linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity="0.3"/><stop offset="100%" stopColor={color} stopOpacity="0"/></linearGradient></defs>
+      <polygon points={'0,'+height+' '+pts+' '+width+','+height} fill={'url(#'+gid+')'}/>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx={width} cy={height-((data[data.length-1]-mn)/rng)*height} r="4" fill={color}/>
+    </svg>
+  );
 }
 
-ReactDOM.render(React.createElement(App),document.getElementById('root'));
+function ProgressRing({progress, size=120, stroke=8, color="var(--ember)"}){
+  const r=(size-stroke)/2, c=2*Math.PI*r, o=c-(Math.min(progress,100)/100)*c;
+  return (
+    <svg width={size} height={size} style={{transform:'rotate(-90deg)'}}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke}/>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={c} strokeDashoffset={o} strokeLinecap="round" style={{transition:'stroke-dashoffset 1s ease'}}/>
+    </svg>
+  );
+}
 
+function Toast({msg, onClose}){
+  useEffect(()=>{const t=setTimeout(onClose,3000);return()=>clearTimeout(t)},[]);
+  return <div style={{position:'fixed',top:20,left:'50%',transform:'translateX(-50%)',zIndex:9999,padding:'14px 28px',borderRadius:14,fontSize:14,fontWeight:500,animation:'fadeUp .4s',background:'linear-gradient(135deg,var(--ember),var(--flame))',color:'#fff',fontFamily:"'Sora'"}}>{msg}</div>;
+}
+
+function Sheet({open, onClose, title, children}){
+  if(!open) return null;
+  return (
+    <div style={{position:'fixed',inset:0,zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
+      <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.6)'}} onClick={onClose}/>
+      <div style={{position:'relative',width:'100%',maxWidth:480,background:'var(--smoke)',borderRadius:'24px 24px 0 0',padding:'28px 24px 36px',animation:'fadeUp .35s',maxHeight:'85vh',overflowY:'auto'}}>
+        <div style={{width:40,height:4,borderRadius:2,background:'rgba(255,255,255,.15)',margin:'0 auto 20px'}}/>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
+          {title && <h3 style={{fontSize:18,fontWeight:700}}>{title}</h3>}
+          <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',color:'var(--bone)',marginLeft:'auto'}}><Ic d={P.x} s={20}/></button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN APP ───
+function App(){
+  const hasProfile = DB.l('profile',null) && DB.l('profile',{}).name;
+  const [scr, setScr] = useState(hasProfile ? 'dash' : 'splash');
+  const [toast, setToast] = useState(null);
+  const [notifs, setNotifs] = useState(false);
+  const [ob, setOb] = useState(0);
+  const [pro, setPro] = useState(()=>DB.l('profile',{name:'',currentWeight:'',goalWeight:'',unit:'kg',height:'',heightUnit:'cm',activityLevel:'moderate',motivation:''}));
+  const [wh, setWh] = useState(()=>DB.l('wh',[]));
+  const [dl, setDl] = useState(()=>{
+    const today=new Date().toDateString(), saved=DB.l('dl',null);
+    return saved&&saved._d===today ? saved : {water:0,calories:0,steps:0,sleep:0,exercise:0,_d:today};
+  });
+  const [fl, setFl] = useState(()=>DB.l('fl',[]));
+  const [meas, setMeas] = useState(()=>DB.l('meas',{waist:'',chest:'',hips:'',arms:'',thighs:''}));
+  const [streak] = useState(()=>DB.l('streak',1));
+  const [notes, setNotes] = useState(()=>DB.l('notes',''));
+  const [mot, setMot] = useState('');
+  const [motL, setMotL] = useState(false);
+  const [mealS, setMealS] = useState(null);
+  const [mealL, setMealL] = useState(false);
+  const [wk, setWk] = useState(null);
+  const [wkL, setWkL] = useState(false);
+  const [msgs, setMsgs] = useState(()=>DB.l('msgs',[]));
+  const ciRef = useRef(null);
+  const [ciBtn, setCiBtn] = useState(false);
+  const [cL, setCL] = useState(false);
+  const [md, setMd] = useState(null);
+  const [mi, setMi] = useState({});
+  const [afL, setAfL] = useState(false);
+  const chatEnd = useRef(null);
+
+  // persist
+  useEffect(()=>{if(pro.name)DB.s('profile',pro)},[pro]);
+  useEffect(()=>{if(wh.length)DB.s('wh',wh)},[wh]);
+  useEffect(()=>{DB.s('dl',dl)},[dl]);
+  useEffect(()=>{DB.s('fl',fl)},[fl]);
+  useEffect(()=>{DB.s('meas',meas)},[meas]);
+  useEffect(()=>{DB.s('notes',notes)},[notes]);
+  useEffect(()=>{DB.s('msgs',msgs)},[msgs]);
+
+  const go = useCallback(s=>setScr(s),[]);
+  const tt = m=>setToast(m);
+
+  useEffect(()=>{if(scr==='splash'){const t=setTimeout(()=>setScr(hasProfile?'dash':'ob'),2500);return()=>clearTimeout(t)}},[scr]);
+  useEffect(()=>{if(scr==='dash'&&!mot)loadMot()},[scr]);
+  useEffect(()=>{if(chatEnd.current)chatEnd.current.scrollIntoView({behavior:'smooth'})},[msgs]);
+
+  const cw=parseFloat(pro.currentWeight)||0, gw=parseFloat(pro.goalWeight)||0;
+  const lost=wh.length>1?Math.round((wh[0]-wh[wh.length-1])*10)/10:0;
+  const pct=wh.length>1&&gw?Math.min(100,Math.max(0,Math.round(((wh[0]-wh[wh.length-1])/(wh[0]-gw))*100))):0;
+  const uc={name:pro.name||'Champ',cw:pro.currentWeight,gw:pro.goalWeight,unit:pro.unit,lost:Math.abs(lost),streak};
+  const fullCtx=AI.buildContext(pro,dl,fl,wh,meas,notes,streak);
+
+  const loadMot=async()=>{setMotL(true);setMot(await AI.motivation(fullCtx));setMotL(false)};
+
+  const sendChat=async()=>{
+    var val=ciRef.current?ciRef.current.value:'';
+    if(!val.trim()||cL)return;
+    const m=val.trim();
+    if(ciRef.current)ciRef.current.value='';
+    setCiBtn(false);
+    const newMsgs=[].concat(msgs,[{r:'u',t:m}]);
+    setMsgs(newMsgs);setCL(true);
+    var sysPrompt=AI.systemPrompt(fullCtx);
+    var historyToSend=newMsgs.slice(-20);
+    var reply=await AI.callWithHistory(sysPrompt,historyToSend);
+    if(!reply) reply='I am having trouble connecting right now. Try again in a moment! 🔥';
+    setMsgs(function(p){return [].concat(p,[{r:'a',t:reply}])});setCL(false);
+  };
+
+  // ─── SPLASH ───
+  if(scr==='splash') return (
+    <div style={{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'radial-gradient(ellipse at center,var(--smoke),var(--coal) 70%)',position:'relative'}}>
+      <div style={{position:'absolute',inset:0,background:'radial-gradient(circle at 50% 40%,rgba(255,107,53,.08),transparent 60%)'}}/>
+      <div className="ag" style={{width:100,height:100,borderRadius:28,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:28}}><Ic d={P.flame} s={48} c="white"/></div>
+      <h1 className="serif au" style={{fontSize:52,background:'linear-gradient(135deg,var(--bone),var(--ember))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>SHED</h1>
+      <p className="au" style={{fontSize:14,color:'rgba(255,255,255,.6)',letterSpacing:'.15em',textTransform:'uppercase',marginTop:8,animationDelay:'.2s'}}>Drop the weight. Keep the fire.</p>
+    </div>
+  );
+
+  // ─── ONBOARDING ───
+  if(scr==='ob'){
+    const steps=[
+      {t:'What should we call you?',s:'Let\'s make this personal.',c:<input className="inf" placeholder="Your name" value={pro.name} onChange={e=>setPro(p=>({...p,name:e.target.value}))} style={{fontSize:18,textAlign:'center',padding:18}}/>,v:()=>pro.name.trim().length>0},
+      {t:'Where are you starting?',s:'No judgment.',c:(
+        <div style={{display:'flex',flexDirection:'column',gap:16}}>
+          <div style={{display:'flex',gap:12}}><input className="inf" type="number" placeholder="Current weight" value={pro.currentWeight} onChange={e=>setPro(p=>({...p,currentWeight:e.target.value}))} style={{flex:1}}/><select className="inf" value={pro.unit} onChange={e=>setPro(p=>({...p,unit:e.target.value}))} style={{width:80}}><option value="kg">kg</option><option value="lbs">lbs</option></select></div>
+          <div style={{display:'flex',gap:12}}><input className="inf" type="number" placeholder="Height" value={pro.height} onChange={e=>setPro(p=>({...p,height:e.target.value}))} style={{flex:1}}/><select className="inf" value={pro.heightUnit} onChange={e=>setPro(p=>({...p,heightUnit:e.target.value}))} style={{width:80}}><option value="cm">cm</option><option value="ft">ft</option></select></div>
+        </div>),v:()=>pro.currentWeight&&pro.height},
+      {t:'What\'s the target?',s:'Dream big.',c:(
+        <div style={{display:'flex',flexDirection:'column',gap:16}}>
+          <div style={{display:'flex',gap:12,alignItems:'center'}}><input className="inf" type="number" placeholder="Goal weight" value={pro.goalWeight} onChange={e=>setPro(p=>({...p,goalWeight:e.target.value}))} style={{flex:1,fontSize:18,textAlign:'center'}}/><span style={{color:'rgba(255,255,255,.6)'}}>{pro.unit}</span></div>
+          {pro.currentWeight&&pro.goalWeight&&<div className="cd au" style={{textAlign:'center',padding:20}}><p style={{fontSize:13,color:'rgba(255,255,255,.6)',marginBottom:8}}>You want to shed</p><p className="serif" style={{fontSize:42,color:'var(--ember)'}}>{Math.abs(parseFloat(pro.currentWeight)-parseFloat(pro.goalWeight)).toFixed(1)}<span style={{fontSize:18,color:'rgba(255,255,255,.6)'}}> {pro.unit}</span></p></div>}
+        </div>),v:()=>pro.goalWeight},
+      {t:'How active are you?',s:'Be honest.',c:(
+        <div style={{display:'flex',flexDirection:'column',gap:12}}>
+          {[{v:'sedentary',l:'Sedentary',d:'Desk job'},{v:'light',l:'Lightly Active',d:'Light walks'},{v:'moderate',l:'Moderate',d:'Exercise 3-4x/week'},{v:'active',l:'Very Active',d:'Intense 5-6x/week'}].map(lv=>(
+            <button key={lv.v} onClick={()=>setPro(p=>({...p,activityLevel:lv.v}))} className="cd" style={{textAlign:'left',cursor:'pointer',border:pro.activityLevel===lv.v?'2px solid var(--ember)':'1px solid rgba(255,255,255,.06)',background:pro.activityLevel===lv.v?'rgba(255,107,53,.06)':'transparent'}}><p style={{fontWeight:600}}>{lv.l}</p><p style={{fontSize:13,color:'rgba(255,255,255,.6)',marginTop:4}}>{lv.d}</p></button>
+          ))}
+        </div>),v:()=>true}
+    ];
+    const st=steps[ob];
+    return(
+      <div style={{maxWidth:480,margin:'0 auto',minHeight:'100vh',display:'flex',flexDirection:'column',background:'var(--coal)'}}>
+        <div style={{padding:'24px 24px 0'}}><div style={{display:'flex',gap:6,marginBottom:40}}>{steps.map((_,i)=><div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=ob?'var(--ember)':'rgba(255,255,255,.1)'}}/>)}</div></div>
+        <div className="au" key={ob} style={{flex:1,padding:'0 24px',display:'flex',flexDirection:'column'}}>
+          <h2 className="serif" style={{fontSize:32,lineHeight:1.2,marginBottom:8}}>{st.t}</h2>
+          <p style={{fontSize:15,color:'rgba(255,255,255,.6)',marginBottom:36}}>{st.s}</p>
+          <div style={{flex:1}}>{st.c}</div>
+        </div>
+        <div style={{padding:24,display:'flex',gap:12}}>
+          {ob>0&&<button className="bs" onClick={()=>setOb(o=>o-1)} style={{padding:'14px 24px',width:'auto'}}><Ic d={P.back} s={18}/></button>}
+          <button className="bp" disabled={!st.v()} onClick={()=>{
+            if(!st.v())return;
+            if(ob<steps.length-1){setOb(o=>o+1)}
+            else{
+              const c=parseFloat(pro.currentWeight);
+              if(wh.length===0){setWh([c]);}
+              go('dash');
+            }
+          }}>{ob<steps.length-1?'Continue':'Start Shedding 🔥'}</button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── TABS ───
+  const tabs=[{id:'dash',l:'Home',p:P.home},{id:'coach',l:'AI Coach',p:P.sparkle},{id:'prog',l:'Progress',p:P.chart},{id:'prof',l:'Profile',p:P.user}];
+  const showTabs=['dash','coach','prog','prof'].includes(scr);
+
+  return(
+    <div style={{maxWidth:480,margin:'0 auto',minHeight:'100vh',background:'var(--coal)',position:'relative'}}>
+      {toast&&<Toast msg={toast} onClose={()=>setToast(null)}/>}
+
+      {/* MODALS */}
+      <Sheet open={md==='water'} onClose={()=>setMd(null)} title="Log Water 💧">
+        <div style={{display:'flex',justifyContent:'center',gap:6,marginBottom:24}}>{Array.from({length:8}).map((_,i)=>(<div key={i} onClick={()=>setMi({water:i+1})} style={{width:34,height:48,borderRadius:10,background:i<((nn(mi.water,dl.water)))?'rgba(52,152,219,.25)':'rgba(255,255,255,.04)',border:'1px solid '+(i<((nn(mi.water,dl.water)))?'rgba(52,152,219,.5)':'rgba(255,255,255,.08)'),cursor:'pointer',display:'flex',alignItems:'flex-end',justifyContent:'center',paddingBottom:6}}>{i<((nn(mi.water,dl.water)))&&<Ic d={P.water} s={16} c="#3498DB"/>}</div>))}</div>
+        <div style={{display:'flex',alignItems:'center',gap:20,justifyContent:'center',marginBottom:20}}><button className="sbtn" onClick={()=>setMi(p=>({water:Math.max(0,((nn(p.water,dl.water)))-1)}))}>−</button><div><span className="serif" style={{fontSize:48,color:'#3498DB'}}>{(nn(mi.water,dl.water))}</span><span style={{fontSize:16,color:'rgba(255,255,255,.55)',marginLeft:6}}>glasses</span></div><button className="sbtn" onClick={()=>setMi(p=>({water:Math.min(20,((nn(p.water,dl.water)))+1)}))}>+</button></div>
+        <input className="inf" type="number" placeholder="Or type exact..." onChange={e=>setMi({water:parseInt(e.target.value)||0})} style={{marginBottom:16}}/>
+        <button className="bp" onClick={()=>{setDl(p=>({...p,water:(nn(mi.water,p.water))}));setMd(null);tt('Water: '+((nn(mi.water,dl.water)))+' glasses 💧')}}>Save</button>
+      </Sheet>
+
+      <Sheet open={md==='cal'} onClose={()=>setMd(null)} title="Log Calories 🍽️">
+        <div style={{display:'flex',alignItems:'center',gap:20,justifyContent:'center',marginBottom:20}}><button className="sbtn" onClick={()=>setMi(p=>({cal:Math.max(0,((nn(p.cal,dl.calories)))-50)}))}>−</button><div style={{textAlign:'center'}}><span className="serif" style={{fontSize:48,color:'#E67E22'}}>{(nn(mi.cal,dl.calories))}</span><span style={{fontSize:16,color:'rgba(255,255,255,.55)',marginLeft:6}}>kcal</span></div><button className="sbtn" onClick={()=>setMi(p=>({cal:((nn(p.cal,dl.calories)))+50}))}>+</button></div>
+        <input className="inf" type="number" placeholder="Type exact..." onChange={e=>setMi({cal:parseInt(e.target.value)||0})} style={{marginBottom:12}}/>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:16}}>{[{l:'Snack',c:150},{l:'Light',c:350},{l:'Full',c:600}].map(q=>(<button key={q.l} className="cd" onClick={()=>setMi(p=>({cal:((nn(p.cal,dl.calories)))+q.c}))} style={{cursor:'pointer',textAlign:'center',padding:14}}><p style={{fontSize:18,fontWeight:700,color:'#E67E22'}}>{q.c}</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>{q.l}</p></button>))}</div>
+        <button className="bp" onClick={()=>{setDl(p=>({...p,calories:(nn(mi.cal,p.calories))}));setMd(null);tt('Calories: '+((nn(mi.cal,dl.calories))))}}>Save</button>
+      </Sheet>
+
+      <Sheet open={md==='steps'} onClose={()=>setMd(null)} title="Log Steps 🚶">
+        <div style={{display:'flex',alignItems:'center',gap:20,justifyContent:'center',marginBottom:20}}><button className="sbtn" onClick={()=>setMi(p=>({steps:Math.max(0,((nn(p.steps,dl.steps)))-500)}))}>−</button><div style={{textAlign:'center'}}><span className="serif" style={{fontSize:48,color:'#2ECC71'}}>{((nn(mi.steps,dl.steps))).toLocaleString()}</span><span style={{fontSize:14,color:'rgba(255,255,255,.55)',marginLeft:6}}>steps</span></div><button className="sbtn" onClick={()=>setMi(p=>({steps:((nn(p.steps,dl.steps)))+500}))}>+</button></div>
+        <input className="inf" type="number" placeholder="Type exact..." onChange={e=>setMi({steps:parseInt(e.target.value)||0})} style={{marginBottom:12}}/>
+        <div style={{display:'flex',gap:8,marginBottom:16}}>{[1000,2500,5000,10000].map(s=>(<button key={s} className="cd" onClick={()=>setMi({steps:s})} style={{flex:1,cursor:'pointer',textAlign:'center',padding:12}}><p style={{fontSize:14,fontWeight:600,color:'#2ECC71'}}>{s>=1000?(s/1000)+'k':s}</p></button>))}</div>
+        <button className="bp" onClick={()=>{setDl(p=>({...p,steps:(nn(mi.steps,p.steps))}));setMd(null);tt('Steps: '+((nn(mi.steps,dl.steps))))}}>Save</button>
+      </Sheet>
+
+      <Sheet open={md==='sleep'} onClose={()=>setMd(null)} title="Log Sleep 🌙">
+        <div style={{display:'flex',alignItems:'center',gap:20,justifyContent:'center',marginBottom:20}}><button className="sbtn" onClick={()=>setMi(p=>({sleep:Math.max(0,((nn(p.sleep,dl.sleep)))-.5)}))}>−</button><div style={{textAlign:'center'}}><span className="serif" style={{fontSize:48,color:'#9B59B6'}}>{((nn(mi.sleep,dl.sleep))).toFixed(1)}</span><span style={{fontSize:16,color:'rgba(255,255,255,.55)',marginLeft:6}}>hrs</span></div><button className="sbtn" onClick={()=>setMi(p=>({sleep:Math.min(24,((nn(p.sleep,dl.sleep)))+.5)}))}>+</button></div>
+        <p style={{fontSize:13,color:'rgba(255,255,255,.55)',marginBottom:10}}>QUALITY</p>
+        <div style={{display:'flex',gap:8,marginBottom:16}}>{['😴 Poor','😐 Fair','😊 Good','🌟 Great'].map(q=>(<button key={q} onClick={()=>setMi(p=>({...p,sq:q}))} className="cd" style={{flex:1,cursor:'pointer',textAlign:'center',padding:10,fontSize:12,border:mi.sq===q?'1px solid #9B59B6':'1px solid rgba(255,255,255,.06)',background:mi.sq===q?'rgba(155,89,182,.1)':'transparent'}}>{q}</button>))}</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:6}}>Bedtime</p><input className="inf" type="time" value={mi.bed||''} onChange={e=>setMi(p=>({...p,bed:e.target.value}))}/></div><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:6}}>Wake</p><input className="inf" type="time" value={mi.wake||''} onChange={e=>setMi(p=>({...p,wake:e.target.value}))}/></div></div>
+        <button className="bp" onClick={()=>{setDl(p=>({...p,sleep:(nn(mi.sleep,p.sleep))}));setMd(null);tt('Sleep: '+((nn(mi.sleep,dl.sleep))).toFixed(1)+'hrs')}}>Save</button>
+      </Sheet>
+
+      <Sheet open={md==='food'} onClose={()=>setMd(null)} title="Log Food 🍎">
+        <p style={{fontSize:13,color:'rgba(255,255,255,.6)',marginBottom:14}}>Describe what you ate — AI estimates nutrition.</p>
+        <textarea className="inf" placeholder="e.g. 2 eggs, toast with butter" value={mi.fd||''} onChange={e=>setMi(p=>({...p,fd:e.target.value}))} style={{minHeight:80,marginBottom:12}}/>
+        <button className="bp" disabled={!(mi.fd&&mi.fd.trim())||afL} onClick={async()=>{setAfL(true);const r=await AI.analyzeMeal(mi.fd,fullCtx);setAfL(false);setFl(p=>[...p,r]);setDl(p=>({...p,calories:p.calories+r.calories}));setMi({});setMd(null);tt('Logged: '+r.name+' ('+r.calories+' cal)')}} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:20}}><Ic d={P.sparkle} s={16} c="white" f={true}/> {afL?'Analyzing...':'Analyze with AI'}</button>
+        <div style={{borderTop:'1px solid rgba(255,255,255,.06)',paddingTop:20}}><p style={{fontSize:13,color:'rgba(255,255,255,.55)',marginBottom:12}}>OR MANUALLY</p><input className="inf" placeholder="Food name" style={{marginBottom:10}} value={mi.mn||''} onChange={e=>setMi(p=>({...p,mn:e.target.value}))}/><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}><input className="inf" type="number" placeholder="Calories" value={mi.mc||''} onChange={e=>setMi(p=>({...p,mc:e.target.value}))}/><input className="inf" type="number" placeholder="Protein(g)" value={mi.mp||''} onChange={e=>setMi(p=>({...p,mp:e.target.value}))}/><input className="inf" type="number" placeholder="Carbs(g)" value={mi.mcb||''} onChange={e=>setMi(p=>({...p,mcb:e.target.value}))}/><input className="inf" type="number" placeholder="Fat(g)" value={mi.mf||''} onChange={e=>setMi(p=>({...p,mf:e.target.value}))}/></div><button className="bs" onClick={()=>{if(!mi.mn)return;const e={name:mi.mn,calories:parseInt(mi.mc)||0,protein:(mi.mp||0)+'g',carbs:(mi.mcb||0)+'g',fat:(mi.mf||0)+'g'};setFl(p=>[...p,e]);setDl(p=>({...p,calories:p.calories+e.calories}));setMi({});setMd(null);tt('Logged: '+e.name)}}>Log Manually</button></div>
+      </Sheet>
+
+      <Sheet open={md==='exercise'} onClose={()=>setMd(null)} title="Log Exercise 💪">
+        <input className="inf" placeholder="Exercise type" style={{marginBottom:12}} value={mi.et||''} onChange={e=>setMi(p=>({...p,et:e.target.value}))}/>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:6}}>Duration (min)</p><input className="inf" type="number" placeholder="30" value={mi.ed||''} onChange={e=>setMi(p=>({...p,ed:e.target.value}))}/></div><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:6}}>Cal burned</p><input className="inf" type="number" placeholder="200" value={mi.ec||''} onChange={e=>setMi(p=>({...p,ec:e.target.value}))}/></div></div>
+        <p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:8}}>INTENSITY</p>
+        <div style={{display:'flex',gap:8,marginBottom:16}}>{['Light','Moderate','Intense'].map(lv=>(<button key={lv} onClick={()=>setMi(p=>({...p,ei:lv}))} className="cd" style={{flex:1,cursor:'pointer',textAlign:'center',padding:12,fontSize:13,border:mi.ei===lv?'1px solid var(--flame)':'1px solid rgba(255,255,255,.06)',background:mi.ei===lv?'rgba(255,159,28,.1)':'transparent'}}>{lv}</button>))}</div>
+        <button className="bp" onClick={()=>{if(!mi.et)return;setDl(p=>({...p,exercise:p.exercise+(parseInt(mi.ec)||0)}));setMi({});setMd(null);tt('Logged: '+mi.et+' 💪')}}>Log Exercise</button>
+      </Sheet>
+
+      <Sheet open={md==='weight'} onClose={()=>setMd(null)} title="Log Weight ⚖️">
+        <div style={{textAlign:'center',marginBottom:8}}><ProgressRing progress={pct} size={140} stroke={8}/><p style={{marginTop:-40,marginBottom:24,fontSize:13,color:'rgba(255,255,255,.55)'}}>{pct}% to goal</p></div>
+        <input className="inf" type="number" step="0.1" placeholder={'Weight in '+pro.unit} value={mi.wt||''} onChange={e=>setMi({wt:e.target.value})} style={{fontSize:22,textAlign:'center',padding:18,marginBottom:12}}/>
+        <div style={{display:'flex',gap:8,marginBottom:16}}>{[-0.5,-0.1,0,0.1,0.5].map(d=>(<button key={d} onClick={()=>setMi({wt:String((cw+d).toFixed(1))})} className="cd" style={{flex:1,cursor:'pointer',textAlign:'center',padding:10,fontSize:13}}>{d>0?'+':''}{d}</button>))}</div>
+        <button className="bp" onClick={()=>{const v=parseFloat(mi.wt);if(isNaN(v))return;setWh(p=>[...p,v]);setPro(p=>({...p,currentWeight:String(v)}));setMi({});setMd(null);tt('Weight: '+v+pro.unit+' 🔥')}}>Log Weight 🔥</button>
+      </Sheet>
+
+      <Sheet open={md==='meas'} onClose={()=>setMd(null)} title="Measurements 📏">
+        {[{k:'waist',l:'Waist'},{k:'chest',l:'Chest'},{k:'hips',l:'Hips'},{k:'arms',l:'Arms'},{k:'thighs',l:'Thighs'}].map(m=>(<div key={m.k} style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}><span style={{fontSize:14,width:60,color:'rgba(248,240,227,.6)'}}>{m.l}</span><input className="inf" type="number" step="0.1" placeholder="cm" value={nn(mi['m_'+m.k], meas[m.k]||'')} onChange={e=>setMi(p=>({...p,['m_'+m.k]:e.target.value}))} style={{flex:1}}/></div>))}
+        <button className="bp" style={{marginTop:8}} onClick={()=>{setMeas(p=>({...p,waist:mi.m_waist||p.waist,chest:mi.m_chest||p.chest,hips:mi.m_hips||p.hips,arms:mi.m_arms||p.arms,thighs:mi.m_thighs||p.thighs}));setMi({});setMd(null);tt('Saved! 📏')}}>Save</button>
+      </Sheet>
+
+      <Sheet open={md==='notes'} onClose={()=>setMd(null)} title="Daily Notes 📝">
+        <textarea className="inf" placeholder="How are you feeling?" style={{minHeight:140}} value={(nn(mi.nt,notes))} onChange={e=>setMi({nt:e.target.value})}/>
+        <div style={{display:'flex',flexWrap:'wrap',gap:6,marginTop:12}}>{['😊 Happy','😤 Motivated','😴 Tired','😋 Cravings','💪 Strong'].map(t=>(<button key={t} onClick={()=>setMi(p=>({nt:(p.nt||notes)+' '+t}))} className="tg" style={{cursor:'pointer',background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.08)',color:'var(--bone)'}}>{t}</button>))}</div>
+        <button className="bp" style={{marginTop:16}} onClick={()=>{setNotes(mi.nt||'');setMi({});setMd(null);tt('Saved!')}}>Save</button>
+      </Sheet>
+
+      {/* ═══ DASHBOARD ═══ */}
+      {scr==='dash'&&(<div style={{paddingBottom:90}}>
+        <div style={{padding:'20px 20px 0',display:'flex',justifyContent:'space-between',alignItems:'center'}}><div><p style={{fontSize:13,color:'rgba(255,255,255,.55)',letterSpacing:'.08em'}}>GOOD {new Date().getHours()<12?'MORNING':new Date().getHours()<17?'AFTERNOON':'EVENING'}</p><h1 className="serif" style={{fontSize:28,marginTop:4}}>{pro.name}</h1></div><button onClick={()=>setNotifs(true)} style={{width:42,height:42,borderRadius:14,background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.08)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',position:'relative'}}><Ic d={P.bell} s={20} c="var(--bone)"/><div style={{position:'absolute',top:8,right:8,width:8,height:8,borderRadius:'50%',background:'var(--glow)'}}/></button></div>
+
+        {/* Motivation */}
+        <div style={{padding:'20px 20px 0'}}><div className="cd au" style={{background:'linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,159,28,.04))',border:'1px solid rgba(255,107,53,.15)',padding:20}}><div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}><Ic d={P.flame} s={20} c="var(--ember)"/><span style={{fontSize:22,fontWeight:700,color:'var(--ember)'}}>{streak}</span><span style={{fontSize:13,color:'rgba(255,255,255,.6)'}}>day streak</span><button onClick={loadMot} style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'var(--ember)',fontSize:12,fontFamily:"'Sora'",fontWeight:500,display:'flex',alignItems:'center',gap:4}}><Ic d={P.sparkle} s={14} c="var(--ember)" f={true}/> New</button></div>{motL?<div style={{height:48}}><div style={{width:'70%',height:12,borderRadius:6,background:'linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.1),rgba(255,255,255,.05))',backgroundSize:'200% 100%',animation:'shimmer 1.5s infinite'}}/></div>:<p style={{fontSize:14,lineHeight:1.7,color:'rgba(248,240,227,.8)',fontStyle:'italic'}}>"{mot||'Your journey starts now.'}"</p>}</div></div>
+
+        {/* Weight */}
+        <div style={{padding:'16px 20px 0'}}><div className="cd" style={{padding:24}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:20}}><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',letterSpacing:'.08em',marginBottom:6}}>CURRENT</p><p className="serif" style={{fontSize:38,lineHeight:1}}>{cw}<span style={{fontSize:16,color:'rgba(255,255,255,.55)'}}> {pro.unit}</span></p></div><div style={{textAlign:'right'}}><p style={{fontSize:12,color:'rgba(255,255,255,.55)',letterSpacing:'.08em',marginBottom:6}}>TO GO</p><p className="serif" style={{fontSize:28,color:'var(--ember)'}}>{Math.abs(cw-gw).toFixed(1)}<span style={{fontSize:14,color:'rgba(255,255,255,.55)'}}> {pro.unit}</span></p></div></div><MiniChart data={wh} width={320} height={70}/><div style={{display:'flex',gap:12,marginTop:16}}><div style={{flex:1,padding:'12px 0',textAlign:'center',background:'rgba(46,204,113,.06)',borderRadius:12,border:'1px solid rgba(46,204,113,.12)'}}><p style={{fontSize:18,fontWeight:700,color:'var(--success)'}}>-{Math.abs(lost)}</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Lost</p></div><div style={{flex:1,padding:'12px 0',textAlign:'center',background:'rgba(255,107,53,.06)',borderRadius:12,border:'1px solid rgba(255,107,53,.12)'}}><p style={{fontSize:18,fontWeight:700,color:'var(--ember)'}}>{pct}%</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Progress</p></div></div><button onClick={()=>{setMi({});setMd('weight')}} className="bp" style={{marginTop:16,padding:12,fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',gap:8}}><Ic d={P.scale} s={16} c="white"/> Log Weight</button></div></div>
+
+        {/* Log Grid */}
+        <div style={{padding:'16px 20px 0'}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}><h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)'}}>TODAY'S LOG</h3><button onClick={()=>{setMi({nt:notes});setMd('notes')}} style={{background:'none',border:'none',cursor:'pointer',color:'rgba(255,255,255,.55)',fontSize:12,fontFamily:"'Sora'",display:'flex',alignItems:'center',gap:4}}><Ic d={P.note} s={14} c="rgba(248,240,227,.4)"/> Notes</button></div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>{[{k:'water',v:dl.water,mx:8,u:'glasses',c:'#3498DB',p:P.water},{k:'cal',v:dl.calories,mx:2000,u:'kcal',c:'#E67E22',p:P.food},{k:'steps',v:dl.steps,mx:10000,u:'steps',c:'#2ECC71',p:P.target},{k:'sleep',v:dl.sleep,mx:9,u:'hrs',c:'#9B59B6',p:P.moon}].map((item,i)=>(<button key={i} className="cd" onClick={()=>{setMi({});setMd(item.k)}} style={{cursor:'pointer',padding:18,textAlign:'left',opacity:0,animation:'fadeUp .4s ease '+(0.15+i*0.08)+'s forwards'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}><Ic d={item.p} s={18} c={item.c}/><span style={{fontSize:11,color:'rgba(255,255,255,.4)'}}>{item.u}</span></div><p style={{fontSize:24,fontWeight:700,color:item.c}}>{typeof item.v==='number'&&item.v%1!==0?item.v.toFixed(1):item.v}</p><div style={{marginTop:8,height:4,borderRadius:2,background:'rgba(255,255,255,.06)'}}><div style={{height:'100%',borderRadius:2,background:item.c,width:Math.min(100,(item.v/item.mx)*100)+'%',transition:'width .5s'}}/></div><p style={{fontSize:11,color:'rgba(248,240,227,.25)',marginTop:6}}>Tap to edit</p></button>))}</div>
+        <div style={{display:'flex',gap:10,marginTop:12}}><button onClick={()=>{setMi({});setMd('food')}} className="cd" style={{flex:1,cursor:'pointer',padding:16,display:'flex',alignItems:'center',gap:10}}><Ic d={P.food} s={18} c="var(--ember)"/><div><p style={{fontWeight:600,fontSize:13}}>Log Food</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>AI analysis</p></div></button><button onClick={()=>{setMi({});setMd('exercise')}} className="cd" style={{flex:1,cursor:'pointer',padding:16,display:'flex',alignItems:'center',gap:10}}><Ic d={P.bolt} s={18} c="var(--flame)"/><div><p style={{fontWeight:600,fontSize:13}}>Exercise</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Track burns</p></div></button></div>
+        <button onClick={()=>{setMi({});setMd('meas')}} className="cd" style={{width:'100%',cursor:'pointer',padding:16,display:'flex',alignItems:'center',gap:10,marginTop:10}}><Ic d={P.ruler} s={18} c="#9B59B6"/><div><p style={{fontWeight:600,fontSize:13}}>Body Measurements</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Waist, chest, hips, arms, thighs</p></div></button></div>
+
+        {/* Quick Actions */}
+        <div style={{padding:'20px 20px 0'}}><div style={{display:'flex',gap:10,overflowX:'auto'}} className="noscroll">{[{l:'AI Meals',p:P.food,a:()=>go('meals')},{l:'Workout',p:P.bolt,a:()=>go('wkout')},{l:'Progress',p:P.chart,a:()=>go('prog')}].map((x,i)=>(<button key={i} onClick={x.a} style={{flexShrink:0,display:'flex',flexDirection:'column',alignItems:'center',gap:10,padding:'16px 20px',borderRadius:16,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.06)',cursor:'pointer',minWidth:85}}><div style={{width:40,height:40,borderRadius:12,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic d={x.p} s={18} c="white"/></div><span style={{fontSize:12,color:'rgba(248,240,227,.6)',fontFamily:"'Sora'",fontWeight:500}}>{x.l}</span></button>))}</div></div>
+
+        {fl.length>0&&<div style={{padding:'20px 20px 0'}}><h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)',marginBottom:12}}>FOOD LOG</h3>{fl.map((f,i)=>(<div key={i} className="cd" style={{padding:14,marginBottom:8,display:'flex',justifyContent:'space-between',alignItems:'center'}}><div><p style={{fontWeight:600,fontSize:14}}>{f.name}</p><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginTop:2}}>P:{f.protein} C:{f.carbs} F:{f.fat}</p></div><span className="tg" style={{background:'rgba(230,126,34,.15)',color:'#E67E22'}}>{f.calories}cal</span></div>))}</div>}
+      </div>)}
+
+      {/* ═══ AI COACH ═══ */}
+      {scr==='coach'&&(<div style={{height:'100vh',display:'flex',flexDirection:'column'}}><div style={{padding:'16px 20px',borderBottom:'1px solid rgba(255,255,255,.06)',display:'flex',alignItems:'center',gap:12}}><div style={{width:40,height:40,borderRadius:12,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic d={P.sparkle} s={20} c="white" f={true}/></div><div style={{flex:1}}><p style={{fontWeight:600,fontSize:16}}>Blaze</p><p style={{fontSize:12,color:'rgba(255,255,255,.55)'}}>Sees your full log & history</p></div></div><div style={{flex:1,overflowY:'auto',padding:20}} className="noscroll">{msgs.length===0&&(<div style={{textAlign:'center',padding:'20px 10px'}}><div style={{width:64,height:64,borderRadius:20,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}><Ic d={P.sparkle} s={28} c="white" f={true}/></div><h3 className="serif" style={{fontSize:22,marginBottom:8}}>Hey {pro.name}!</h3><p style={{color:'rgba(255,255,255,.6)',fontSize:14,lineHeight:1.6,marginBottom:24}}>I can see your full daily log, food intake, weight history, and more. Ask me anything — I'll give you specific advice based on YOUR data.</p><div style={{display:'flex',flexDirection:'column',gap:8}}>{['Review my day so far — how am I doing?','What should I eat for my next meal?','I'm craving something — help me pick smart','Give me a workout I can do right now','Help me build a weekly meal plan','I feel stuck — coach me through it'].map((q,i)=>(<button key={i} onClick={()=>{if(ciRef.current){ciRef.current.value=q;ciRef.current.focus();setCiBtn(true)}}} className="cd" style={{cursor:'pointer',textAlign:'left',padding:14,fontSize:14}}>{q}</button>))}</div></div>)}{msgs.map((m,i)=>(<div key={i} style={{display:'flex',justifyContent:m.r==='u'?'flex-end':'flex-start',marginBottom:12}}>{m.r==='a'&&<div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginRight:8,marginTop:4}}><Ic d={P.sparkle} s={14} c="white" f={true}/></div>}<div style={{maxWidth:'78%',padding:'12px 16px',borderRadius:m.r==='u'?'16px 16px 4px 16px':'16px 16px 16px 4px',background:m.r==='u'?'linear-gradient(135deg,var(--ember),var(--flame))':'rgba(255,255,255,.06)',fontSize:14,lineHeight:1.6}}>{m.t}</div></div>))}{cL&&<div style={{display:'flex',alignItems:'center',gap:6,padding:12}}><div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',marginRight:8}}><Ic d={P.sparkle} s={14} c="white" f={true}/></div>{[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:'50%',background:'var(--ember)',animation:'dotPulse 1.2s ease '+i*0.15+'s infinite'}}/>)}</div>}<div ref={chatEnd}/></div><div style={{padding:'12px 20px 90px',borderTop:'1px solid rgba(255,255,255,.06)',display:'flex',gap:10}}><input className="inf" placeholder="Ask Blaze anything..." ref={ciRef} onChange={e=>setCiBtn(e.target.value.trim().length>0)} onKeyDown={e=>e.key==='Enter'&&sendChat()} style={{flex:1}}/><button onClick={sendChat} disabled={!ciBtn||cL} style={{width:48,height:48,borderRadius:14,background:ciBtn?'linear-gradient(135deg,var(--ember),var(--flame))':'rgba(255,255,255,.05)',border:'none',cursor:ciBtn?'pointer':'default',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic d={P.send} s={18} c="white"/></button></div></div>)}
+
+      {/* ═══ MEALS ═══ */}
+      {scr==='meals'&&(<div style={{minHeight:'100vh',padding:24,paddingBottom:100}}><button onClick={()=>go('dash')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--bone)',display:'flex',alignItems:'center',gap:8,marginBottom:24,fontFamily:"'Sora'",fontSize:14}}><Ic d={P.back} s={18}/> Back</button><h2 className="serif" style={{fontSize:28,marginBottom:4}}>AI Meal Planner</h2><p style={{color:'rgba(255,255,255,.6)',marginBottom:20,fontSize:14}}>Personalized meals with macros</p><div style={{display:'flex',gap:10,marginBottom:16}}><input className="inf" type="number" placeholder="Max cal" style={{flex:1}} value={mi.mc2||''} onChange={e=>setMi(p=>({...p,mc2:e.target.value}))}/><input className="inf" placeholder="Preferences" style={{flex:1.5}} value={mi.mp2||''} onChange={e=>setMi(p=>({...p,mp2:e.target.value}))}/></div><button className="bp" onClick={async()=>{setMealL(true);setMealS(await AI.meal(mi.mc2||500,mi.mp2,fullCtx));setMealL(false)}} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:24}}><Ic d={P.sparkle} s={16} c="white" f={true}/> {mealL?'Generating...':'Generate Meal'}</button>{mealS&&(<div className="cd au" style={{padding:24,border:'1px solid rgba(255,107,53,.15)',marginBottom:20}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:14}}><h3 style={{fontSize:18,fontWeight:700,flex:1}}>{mealS.name}</h3><span className="tg" style={{background:'rgba(46,204,113,.15)',color:'#2ECC71',flexShrink:0}}>{mealS.calories} cal</span></div><p style={{fontSize:14,color:'rgba(248,240,227,.7)',lineHeight:1.6,marginBottom:14}}>{mealS.description}</p><div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}>{[{l:'P',v:mealS.protein},{l:'C',v:mealS.carbs},{l:'F',v:mealS.fat}].filter(n=>n.v).map((n,i)=>(<span key={i} className="tg" style={{background:'rgba(255,107,53,.1)',color:'var(--ember)'}}>{n.l}: {n.v}</span>))}</div><button onClick={()=>{setFl(p=>[...p,mealS]);setDl(p=>({...p,calories:p.calories+mealS.calories}));tt('Added!')}} className="bs">Add to Log</button></div>)}<button onClick={()=>{setMi({});setMd('food')}} className="cd" style={{width:'100%',cursor:'pointer',padding:20,display:'flex',alignItems:'center',gap:14}}><Ic d={P.edit} s={20} c="var(--ember)"/><div><p style={{fontWeight:600}}>Log Custom Food</p><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginTop:2}}>AI or manual</p></div></button></div>)}
+
+      {/* ═══ WORKOUT ═══ */}
+      {scr==='wkout'&&(<div style={{minHeight:'100vh',padding:24,paddingBottom:100}}><button onClick={()=>go('dash')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--bone)',display:'flex',alignItems:'center',gap:8,marginBottom:24,fontFamily:"'Sora'",fontSize:14}}><Ic d={P.back} s={18}/> Back</button><h2 className="serif" style={{fontSize:28,marginBottom:4}}>AI Workouts</h2><p style={{color:'rgba(255,255,255,.6)',marginBottom:20,fontSize:14}}>Fat-burning routines</p><div style={{display:'flex',gap:10,marginBottom:16}}><select className="inf" value={mi.wl||'moderate'} onChange={e=>setMi(p=>({...p,wl:e.target.value}))}><option value="beginner">Beginner</option><option value="moderate">Moderate</option><option value="advanced">Advanced</option></select><select className="inf" value={mi.wd||'20'} onChange={e=>setMi(p=>({...p,wd:e.target.value}))}><option value="10">10 min</option><option value="20">20 min</option><option value="30">30 min</option><option value="45">45 min</option></select></div><button className="bp" onClick={async()=>{setWkL(true);setWk(await AI.workout(mi.wl||'moderate',parseInt(mi.wd)||20,fullCtx));setWkL(false)}} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:24}}><Ic d={P.sparkle} s={16} c="white" f={true}/> {wkL?'Generating...':'Generate Workout'}</button>{wk&&<div className="au"><div className="cd" style={{padding:24,marginBottom:16,border:'1px solid rgba(255,107,53,.15)'}}><h3 style={{fontSize:20,fontWeight:700,marginBottom:8}}>{wk.name}</h3><div style={{display:'flex',gap:12}}><span className="tg" style={{background:'rgba(255,107,53,.1)',color:'var(--ember)'}}>{wk.duration} min</span><span className="tg" style={{background:'rgba(233,69,96,.1)',color:'var(--glow)'}}>~{wk.calories_est} cal</span></div></div>{(wk.exercises||[]).map((ex,i)=>(<div key={i} className="cd" style={{marginBottom:10,padding:18,display:'flex',alignItems:'center',gap:16,opacity:0,animation:'fadeUp .4s ease '+i*.1+'s forwards'}}><div style={{width:36,height:36,borderRadius:10,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:700,color:'white',flexShrink:0}}>{i+1}</div><div style={{flex:1}}><p style={{fontWeight:600,fontSize:15}}>{ex.name}</p><p style={{fontSize:13,color:'rgba(255,255,255,.6)',marginTop:2}}>{ex.reps} • Rest: {ex.rest}</p></div></div>))}<button onClick={()=>{setDl(p=>({...p,exercise:p.exercise+(wk.calories_est||0)}));tt('Workout logged! 🔥')}} className="bp" style={{marginTop:16}}>Log This Workout</button></div>}</div>)}
+
+      {/* ═══ PROGRESS ═══ */}
+      {scr==='prog'&&(<div style={{minHeight:'100vh',padding:24,paddingBottom:100}}><h2 className="serif" style={{fontSize:28,marginBottom:24}}>Your Progress</h2><div className="cd au" style={{textAlign:'center',padding:32,marginBottom:16,background:'linear-gradient(135deg,rgba(46,204,113,.06),rgba(255,107,53,.04))'}}><p style={{fontSize:13,color:'rgba(255,255,255,.55)',marginBottom:8}}>TOTAL SHED</p><p className="serif" style={{fontSize:56,color:'var(--success)',lineHeight:1}}>{Math.abs(lost)}<span style={{fontSize:20,color:'rgba(255,255,255,.55)'}}> {pro.unit}</span></p><div style={{marginTop:20,height:8,borderRadius:4,background:'rgba(255,255,255,.06)'}}><div className="aburn" style={{height:'100%',borderRadius:4,width:pct+'%'}}/></div><p style={{fontSize:13,color:'rgba(255,255,255,.55)',marginTop:12}}>{pct}% to goal</p></div><div className="cd" style={{padding:24,marginBottom:16}}><h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)',marginBottom:16}}>WEIGHT TREND</h3><MiniChart data={wh} width={300} height={100}/></div>{Object.values(meas).some(v=>v)&&<div className="cd" style={{padding:24,marginBottom:16}}><h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)',marginBottom:14}}>MEASUREMENTS</h3>{[{k:'waist',l:'Waist'},{k:'chest',l:'Chest'},{k:'hips',l:'Hips'},{k:'arms',l:'Arms'},{k:'thighs',l:'Thighs'}].filter(m=>meas[m.k]).map(m=>(<div key={m.k} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.04)'}}><span style={{color:'rgba(255,255,255,.6)'}}>{m.l}</span><span style={{fontWeight:600}}>{meas[m.k]} cm</span></div>))}</div>}<h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)',marginBottom:12}}>ACHIEVEMENTS</h3><div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>{[{n:'First Step',d:'Log weight',p:P.flame,c:'#FF6B35',done:wh.length>0},{n:'Week Warrior',d:'7-day streak',p:P.bolt,c:'#FF9F1C',done:streak>=7},{n:'Hydro Hero',d:'8 glasses',p:P.water,c:'#3498DB',done:dl.water>=8},{n:'5 Down',d:'Lose 5',p:P.trophy,c:'#2ECC71',done:Math.abs(lost)>=5},{n:'10K Steps',d:'10,000',p:P.target,c:'#E94560',done:dl.steps>=10000},{n:'Logger',d:'Log meal',p:P.food,c:'#E67E22',done:fl.length>0}].map((a,i)=>(<div key={i} className="cd" style={{textAlign:'center',padding:16,opacity:a.done?1:.35}}><div style={{width:40,height:40,borderRadius:12,margin:'0 auto 8px',background:a.done?'rgba(255,107,53,.1)':'rgba(255,255,255,.05)',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic d={a.p} s={20} c={a.c}/></div><p style={{fontSize:11,fontWeight:600}}>{a.n}</p><p style={{fontSize:10,color:'rgba(255,255,255,.55)'}}>{a.d}</p></div>))}</div></div>)}
+
+      {/* ═══ PROFILE ═══ */}
+      {scr==='prof'&&(<div style={{minHeight:'100vh',padding:24,paddingBottom:100}}><h2 className="serif" style={{fontSize:28,marginBottom:24}}>Profile</h2><div className="cd" style={{padding:24,marginBottom:16,display:'flex',alignItems:'center',gap:16}}><div style={{width:64,height:64,borderRadius:20,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,fontWeight:700}}>{(pro.name||'U')[0].toUpperCase()}</div><div><h3 style={{fontSize:18,fontWeight:700}}>{pro.name}</h3></div></div><div className="cd" style={{marginBottom:16}}>{[{l:'Weight',v:pro.currentWeight+' '+pro.unit},{l:'Goal',v:pro.goalWeight+' '+pro.unit},{l:'Height',v:pro.height+' '+pro.heightUnit},{l:'Activity',v:pro.activityLevel}].map((it,i)=>(<div key={i} style={{display:'flex',justifyContent:'space-between',padding:'14px 0',borderBottom:i<3?'1px solid rgba(255,255,255,.05)':'none'}}><span style={{fontSize:14,color:'rgba(255,255,255,.6)'}}>{it.l}</span><span style={{fontSize:14,fontWeight:500}}>{it.v}</span></div>))}</div><button onClick={()=>{DB.c();window.location.reload()}} className="bs" style={{color:'var(--glow)'}}>Reset All Data</button></div>)}
+
+      {/* NOTIFS */}
+      {notifs&&<div style={{position:'fixed',inset:0,zIndex:100}}><div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.6)'}} onClick={()=>setNotifs(false)}/><div className="au" style={{position:'relative',width:'100%',maxWidth:420,margin:'0 auto',background:'var(--coal)',borderRadius:'0 0 24px 24px',padding:24,maxHeight:'70vh',overflowY:'auto'}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:20}}><h3 style={{fontSize:18,fontWeight:700}}>Notifications</h3><button onClick={()=>setNotifs(false)} style={{background:'none',border:'none',cursor:'pointer',color:'var(--bone)'}}><Ic d={P.x} s={20}/></button></div>{[{t:'Weigh-in Reminder',m:'Time for your morning weigh-in!',tm:'8:00 AM',p:P.scale,c:'#FF6B35'},{t:'Water Check 💧',m:'Have you hit 8 glasses yet?',tm:'12:30 PM',p:P.water,c:'#3498DB'},{t:streak+'-Day Streak! 🔥',m:'Keep the chain going!',tm:'Yesterday',p:P.flame,c:'#FF9F1C'}].map((n,i)=>(<div key={i} className="cd" style={{marginBottom:12,padding:16,opacity:0,animation:'fadeUp .4s ease '+i*0.1+'s forwards'}}><div style={{display:'flex',gap:12}}><div style={{width:36,height:36,borderRadius:10,background:'rgba('+parseInt(n.c.slice(1,3),16)+','+parseInt(n.c.slice(3,5),16)+','+parseInt(n.c.slice(5,7),16)+',.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Ic d={n.p} s={18} c={n.c}/></div><div><p style={{fontWeight:600,fontSize:14,marginBottom:4}}>{n.t}</p><p style={{fontSize:13,color:'rgba(248,240,227,.6)',lineHeight:1.5}}>{n.m}</p><p style={{fontSize:11,color:'rgba(255,255,255,.4)',marginTop:6}}>{n.tm}</p></div></div></div>))}</div></div>}
+
+      {/* TAB BAR */}
+      {showTabs&&(<div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:50,background:'rgba(26,26,46,.95)',backdropFilter:'blur(20px)',borderTop:'1px solid rgba(255,255,255,.06)',display:'flex',justifyContent:'space-around',padding:'8px 0 24px',maxWidth:480,margin:'0 auto'}}>{tabs.map(t=>(<button key={t.id} onClick={()=>go(t.id)} style={{background:'none',border:'none',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:4,padding:'8px 16px',color:scr===t.id?'var(--ember)':'rgba(248,240,227,.3)'}}><Ic d={t.p} s={22} c={scr===t.id?'var(--ember)':'rgba(248,240,227,.3)'} f={t.p===P.sparkle}/><span style={{fontSize:10,fontWeight:scr===t.id?600:400,fontFamily:"'Sora'"}}>{t.l}</span></button>))}</div>)}
+    </div>
+  );
+}
+
+ReactDOM.render(React.createElement(App), document.getElementById('root'));
 </script>
 </body>
 </html>
