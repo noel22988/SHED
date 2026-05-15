@@ -1,518 +1,900 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1A1A2E">
-<title>SHED — Weight Loss Tracker</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.4/babel.min.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--ember:#FF6B35;--flame:#FF9F1C;--coal:#12121F;--smoke:#16213E;--ash:#0F3460;--glow:#E94560;--bone:#EDEDED;--success:#2ECC71;--premium:#FFD700}
-html,body,#root{height:100%;width:100%}
-body{font-family:'Sora',sans-serif;background:var(--coal);color:var(--bone);overflow-x:hidden;-webkit-font-smoothing:antialiased}
-.serif{font-family:'DM Serif Display',serif}
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(255,107,53,0.3)}50%{box-shadow:0 0 40px rgba(255,107,53,0.6)}}
-@keyframes burn{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-@keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
-.au{animation:fadeUp .6s ease-out forwards}
-.ag{animation:glow 2s ease-in-out infinite}
-.aburn{background:linear-gradient(270deg,var(--ember),var(--flame),var(--glow),var(--ember));background-size:400% 400%;animation:burn 4s ease infinite}
-.bp{background:linear-gradient(135deg,var(--ember),var(--flame));color:#fff;border:none;padding:14px 32px;border-radius:14px;font-family:'Sora';font-weight:600;font-size:15px;cursor:pointer;width:100%;transition:all .3s}
-.bp:disabled{opacity:.4;cursor:default}
-.bs{background:rgba(255,255,255,.06);color:var(--bone);border:1px solid rgba(255,255,255,.12);padding:14px 32px;border-radius:14px;font-family:'Sora';font-weight:500;font-size:15px;cursor:pointer;width:100%}
-.inf{width:100%;padding:14px 18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#fff;font-family:'Sora';font-size:15px;outline:none;transition:border .3s}
-.inf:focus{border-color:var(--ember);box-shadow:0 0 0 3px rgba(255,107,53,.15)}
-.inf::placeholder{color:rgba(255,255,255,.35)}
-textarea.inf{resize:vertical}
-select.inf{appearance:none}
-.cd{background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:24px;transition:all .3s;color:#EDEDED}
-.tg{display:inline-block;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:500}
-.sbtn{width:56px;height:56px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--bone);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Sora';user-select:none}
-.noscroll::-webkit-scrollbar{display:none}.noscroll{-ms-overflow-style:none;scrollbar-width:none}
-@supports(padding-top:env(safe-area-inset-top)){body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}}
-</style>
-</head>
-<body>
-<div id="root"></div>
-<script id="app-code" type="text/babel" data-type="module">
-// ─── Use React globals ───
-function nn(a,b){return a!=null&&a!==undefined?a:b}
-const { useState, useEffect, useRef, useCallback } = React;
+import { useState, useEffect } from "react";
 
-// ─── STORAGE ───
-const DB = {
-  s(k,v){ try{ localStorage.setItem('sh_'+k, JSON.stringify(v)) }catch(e){} },
-  l(k,d){ try{ const v=localStorage.getItem('sh_'+k); return v?JSON.parse(v):d }catch(e){return d} },
-  c(){ Object.keys(localStorage).filter(k=>k.startsWith('sh_')).forEach(k=>localStorage.removeItem(k)) }
-};
+const ACCENT = "#1D9E75";
+const ACCENT_FG = "#ffffff";
 
-// ─── SVG Icon helper ───
-function Ic({d, s=24, c="currentColor", f=false}){
-  return <svg width={s} height={s} viewBox="0 0 24 24" fill={f?c:"none"} stroke={f?"none":c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{__html:d}} />;
+async function loadSt(key) {
+  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; }
+  catch { return null; }
 }
-const P = {
-  flame: '<path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/>',
-  scale: '<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>',
-  target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
-  chart: '<path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>',
-  food: '<path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/>',
-  bolt: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  trophy: '<path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22M18 2H6v7a6 6 0 1012 0V2z"/>',
-  home: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
-  user: '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  bell: '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>',
-  send: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
-  crown: '<path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/>',
-  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
-  back: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
-  water: '<path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>',
-  moon: '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>',
-  sparkle: '<path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z"/><path d="M19 15L19.75 17.25L22 18L19.75 18.75L19 21L18.25 18.75L16 18L18.25 17.25L19 15Z" opacity="0.6"/>',
-  edit: '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>',
-  ruler: '<path d="M21.3 15.3a2.4 2.4 0 010 3.4l-2.6 2.6a2.4 2.4 0 01-3.4 0L2.7 8.7a2.4 2.4 0 010-3.4l2.6-2.6a2.4 2.4 0 013.4 0z"/>',
-  note: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
-};
+async function saveSt(key, v) {
+  try { await window.storage.set(key, JSON.stringify(v)); } catch {}
+}
 
-// ─── AI ───
-const AI = {
-  // Build rich context snapshot from all user data
-  buildContext(pro, dl, fl, wh, meas, notes, streak){
-    const cw=parseFloat(pro.currentWeight)||0, gw=parseFloat(pro.goalWeight)||0;
-    const lost=wh.length>1?Math.round((wh[0]-wh[wh.length-1])*10)/10:0;
-    const pct=wh.length>1&&gw?Math.min(100,Math.max(0,Math.round(((wh[0]-wh[wh.length-1])/(wh[0]-gw))*100))):0;
-    const bmi=pro.height?Math.round(cw/Math.pow(parseFloat(pro.height)/100,2)*10)/10:null;
-    const lastWeighs=wh.slice(-7).map((w,i)=>w+(i<wh.length-1?'':'(latest)')).join(', ');
-    const tdee=Math.round((pro.activityLevel==='sedentary'?1.2:pro.activityLevel==='light'?1.375:pro.activityLevel==='moderate'?1.55:1.725)*(10*cw+6.25*(parseFloat(pro.height)||170)-5*35+5));
-    const deficit=Math.round(tdee*0.75);
+function calcMacros(p) {
+  const w = +p.weight, bf = +p.bodyFat / 100;
+  const lbm = w * (1 - bf);
+  const bmr = Math.round(370 + 21.6 * lbm);
+  const mult = ({ 2: 1.2, 3: 1.375, 4: 1.46, 5: 1.55, 6: 1.725 })[+p.trainingDays] || 1.375;
+  const tdee = Math.round(bmr * mult);
+  const tMult = { cut: 0.725, bulk: 1.125, recomp: 1.0 }[p.goal] || 0.725;
+  const cMult = { cut: 0.75, bulk: 1.15, recomp: 1.02 }[p.goal] || 0.75;
+  const fMult = { cut: 0.70, bulk: 1.10, recomp: 0.98 }[p.goal] || 0.70;
+  const target = Math.round(tdee * tMult);
+  const protein = Math.round(lbm * 2.5);
+  const fat = Math.max(50, Math.round(lbm * 0.8));
+  const carbs = Math.max(0, Math.round((target - protein * 4 - fat * 9) / 4));
+  return {
+    lbm: Math.round(lbm), bmr, tdee, target,
+    ceiling: Math.round(tdee * cMult),
+    floor: Math.round(tdee * fMult),
+    protein, fat, carbs
+  };
+}
 
-    let ctx='## USER PROFILE\n';
-    ctx+='Name: '+pro.name+'\n';
-    ctx+='Current weight: '+cw+pro.unit+' | Goal: '+gw+pro.unit+' | To lose: '+Math.abs(cw-gw).toFixed(1)+pro.unit+'\n';
-    ctx+='Height: '+(pro.height||'?')+pro.heightUnit+' | BMI: '+(bmi||'?')+'\n';
-    ctx+='Activity level: '+pro.activityLevel+'\n';
-    ctx+='Estimated TDEE: ~'+tdee+' cal/day | Suggested deficit target: ~'+deficit+' cal/day\n';
-    ctx+='Total lost so far: '+Math.abs(lost)+pro.unit+' ('+pct+'% to goal)\n';
-    ctx+='Current streak: '+streak+' days\n';
-    ctx+='Motivation: '+(pro.motivation||'not specified')+'\n';
-    if(lastWeighs) ctx+='Recent weigh-ins: '+lastWeighs+'\n';
+async function askClaude(system, user, tokens = 1200) {
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: tokens,
+        system,
+        messages: [{ role: "user", content: user }]
+      })
+    });
+    const d = await r.json();
+    return d.content?.[0]?.text || "Error generating response. Please try again.";
+  } catch { return "Network error. Please try again."; }
+}
 
-    ctx+='\n## TODAY\'S LOG ('+new Date().toLocaleDateString('en-SG',{weekday:'long',month:'short',day:'numeric'})+')\n';
-    ctx+='Water: '+dl.water+'/8 glasses\n';
-    ctx+='Calories consumed: '+dl.calories+' kcal'+(deficit?' (target: ~'+deficit+')':'')+'\n';
-    ctx+='Steps: '+dl.steps.toLocaleString()+'/10,000\n';
-    ctx+='Sleep: '+dl.sleep+' hours\n';
-    ctx+='Exercise calories burned: '+dl.exercise+' kcal\n';
+const DB = [
+  { id:1,  name:"Chicken Rice (steamed)",       cat:"Rice",        cal:607, p:36, c:71, f:18 },
+  { id:2,  name:"Chicken Rice (roasted)",        cat:"Rice",        cal:650, p:38, c:71, f:22 },
+  { id:3,  name:"Nasi Lemak (chicken wing)",     cat:"Rice",        cal:720, p:28, c:78, f:32 },
+  { id:4,  name:"Nasi Lemak (egg & ikan bilis)", cat:"Rice",        cal:490, p:15, c:68, f:19 },
+  { id:5,  name:"Economy Rice (3 items)",        cat:"Rice",        cal:580, p:22, c:72, f:21 },
+  { id:6,  name:"Economy Rice (2 veg 1 meat)",   cat:"Rice",        cal:520, p:25, c:65, f:18 },
+  { id:7,  name:"Claypot Rice",                  cat:"Rice",        cal:680, p:28, c:82, f:24 },
+  { id:8,  name:"Nasi Biryani (chicken)",        cat:"Rice",        cal:750, p:35, c:85, f:25 },
+  { id:9,  name:"Fried Rice",                    cat:"Rice",        cal:520, p:12, c:78, f:16 },
+  { id:10, name:"Lor Mei Fan",                   cat:"Rice",        cal:550, p:18, c:78, f:18 },
+  { id:11, name:"Char Kway Teow",                cat:"Noodles",     cal:744, p:28, c:82, f:32 },
+  { id:12, name:"Laksa",                         cat:"Noodles",     cal:589, p:26, c:65, f:25 },
+  { id:13, name:"Mee Goreng",                    cat:"Noodles",     cal:620, p:22, c:80, f:22 },
+  { id:14, name:"Wonton Mee (dry)",              cat:"Noodles",     cal:480, p:22, c:65, f:14 },
+  { id:15, name:"Wonton Mee (soup)",             cat:"Noodles",     cal:420, p:20, c:62, f:10 },
+  { id:16, name:"Bak Chor Mee (dry)",            cat:"Noodles",     cal:510, p:26, c:62, f:16 },
+  { id:17, name:"Fishball Noodles (soup)",       cat:"Noodles",     cal:380, p:18, c:58, f:8  },
+  { id:18, name:"Hokkien Mee",                   cat:"Noodles",     cal:660, p:30, c:78, f:24 },
+  { id:19, name:"Mee Rebus",                     cat:"Noodles",     cal:540, p:20, c:78, f:14 },
+  { id:20, name:"Mee Siam",                      cat:"Noodles",     cal:490, p:18, c:72, f:14 },
+  { id:21, name:"Prawn Mee (soup)",              cat:"Noodles",     cal:450, p:28, c:55, f:12 },
+  { id:22, name:"Yong Tau Foo (soup, 8 items)",  cat:"Noodles",     cal:350, p:22, c:40, f:10 },
+  { id:23, name:"Yong Tau Foo (dry, 8 items)",   cat:"Noodles",     cal:320, p:20, c:36, f:10 },
+  { id:24, name:"Ban Mian (soup)",               cat:"Noodles",     cal:420, p:24, c:52, f:12 },
+  { id:25, name:"Beef Kway Teow (soup)",         cat:"Noodles",     cal:480, p:30, c:58, f:12 },
+  { id:26, name:"Economy Bee Hoon (2v1m)",       cat:"Noodles",     cal:480, p:22, c:60, f:16 },
+  { id:27, name:"Bak Kut Teh (pork ribs)",       cat:"Soup",        cal:430, p:38, c:8,  f:26 },
+  { id:28, name:"Sliced Fish Soup",              cat:"Soup",        cal:280, p:28, c:22, f:8  },
+  { id:29, name:"Mutton Soup",                   cat:"Soup",        cal:320, p:30, c:10, f:18 },
+  { id:30, name:"Pig Organ Soup",                cat:"Soup",        cal:290, p:26, c:12, f:14 },
+  { id:31, name:"Chicken Congee",                cat:"Soup",        cal:280, p:18, c:38, f:6  },
+  { id:32, name:"Thunder Tea Rice (lei cha)",    cat:"Healthy",     cal:420, p:18, c:62, f:12 },
+  { id:33, name:"Steamed Fish with Rice",        cat:"Healthy",     cal:450, p:32, c:52, f:10 },
+  { id:34, name:"Mixed Veg Rice (no meat)",      cat:"Healthy",     cal:380, p:10, c:68, f:10 },
+  { id:35, name:"Kaya Toast Set (kopi + eggs)",  cat:"Breakfast",   cal:450, p:14, c:55, f:18 },
+  { id:36, name:"Roti Prata (plain, 2 pcs)",     cat:"Breakfast",   cal:380, p:10, c:52, f:15 },
+  { id:37, name:"Roti Prata (egg, 1 pc)",        cat:"Breakfast",   cal:280, p:10, c:32, f:13 },
+  { id:38, name:"Thosai (plain)",                cat:"Breakfast",   cal:180, p:5,  c:34, f:4  },
+  { id:39, name:"Idli (2 pcs + sambar)",         cat:"Breakfast",   cal:180, p:6,  c:34, f:3  },
+  { id:40, name:"Chicken Briyani",               cat:"Indian",      cal:780, p:40, c:88, f:26 },
+  { id:41, name:"Mutton Briyani",                cat:"Indian",      cal:820, p:42, c:88, f:30 },
+  { id:42, name:"Fish Head Curry (with rice)",   cat:"Indian",      cal:680, p:38, c:72, f:24 },
+  { id:43, name:"Curry Chicken (with rice)",     cat:"Indian",      cal:640, p:32, c:72, f:22 },
+  { id:44, name:"Satay Chicken (10 sticks)",     cat:"BBQ",         cal:400, p:40, c:20, f:16 },
+  { id:45, name:"Satay Mutton (10 sticks)",      cat:"BBQ",         cal:440, p:38, c:20, f:20 },
+  { id:46, name:"BBQ Chicken Wing (2 pcs)",      cat:"BBQ",         cal:320, p:28, c:6,  f:20 },
+  { id:47, name:"Sambal Stingray",               cat:"BBQ",         cal:280, p:30, c:12, f:12 },
+  { id:48, name:"Popiah (1 pc)",                 cat:"Snacks",      cal:180, p:6,  c:28, f:5  },
+  { id:49, name:"Curry Puff (1 pc)",             cat:"Snacks",      cal:250, p:6,  c:30, f:12 },
+  { id:50, name:"Otah (1 pc)",                   cat:"Snacks",      cal:80,  p:8,  c:4,  f:4  },
+  { id:51, name:"Ngoh Hiang (1 roll)",           cat:"Snacks",      cal:120, p:8,  c:10, f:6  },
+  { id:52, name:"McD McChicken",                 cat:"Fast Food",   cal:402, p:19, c:40, f:19 },
+  { id:53, name:"McD McSpicy",                   cat:"Fast Food",   cal:485, p:26, c:44, f:22 },
+  { id:54, name:"McD Double Cheeseburger",       cat:"Fast Food",   cal:445, p:27, c:35, f:23 },
+  { id:55, name:"McD Fries (medium)",            cat:"Fast Food",   cal:337, p:4,  c:44, f:16 },
+  { id:56, name:"KFC Original (2 pcs)",          cat:"Fast Food",   cal:480, p:36, c:22, f:28 },
+  { id:57, name:"KFC Zinger Burger",             cat:"Fast Food",   cal:491, p:29, c:46, f:21 },
+  { id:58, name:"Subway Chicken Teriyaki 6in",   cat:"Fast Food",   cal:330, p:26, c:44, f:5  },
+  { id:59, name:"Subway Tuna 6in",               cat:"Fast Food",   cal:430, p:22, c:44, f:18 },
+  { id:60, name:"Burger King Whopper",           cat:"Fast Food",   cal:657, p:28, c:49, f:40 },
+  { id:61, name:"Popeyes Chicken Sandwich",      cat:"Fast Food",   cal:690, p:28, c:50, f:42 },
+  { id:62, name:"7-Eleven Tuna Sandwich",        cat:"Convenience", cal:290, p:16, c:36, f:9  },
+  { id:63, name:"7-Eleven Egg Mayo Sandwich",    cat:"Convenience", cal:320, p:12, c:40, f:12 },
+  { id:64, name:"7-Eleven Onigiri (salmon)",     cat:"Convenience", cal:190, p:6,  c:36, f:3  },
+  { id:65, name:"7-Eleven Chicken Pie",          cat:"Convenience", cal:360, p:12, c:38, f:18 },
+  { id:66, name:"FairPrice Roasted Chicken",     cat:"Convenience", cal:165, p:31, c:0,  f:4  },
+  { id:67, name:"Boiled Egg",                    cat:"Convenience", cal:78,  p:6,  c:0,  f:5  },
+  { id:68, name:"Kopi O Kosong",                 cat:"Drinks",      cal:5,   p:0,  c:0,  f:0  },
+  { id:69, name:"Kopi (condensed milk)",         cat:"Drinks",      cal:90,  p:2,  c:14, f:3  },
+  { id:70, name:"Teh Tarik",                     cat:"Drinks",      cal:130, p:4,  c:20, f:4  },
+  { id:71, name:"Teh O (no sugar)",              cat:"Drinks",      cal:5,   p:0,  c:1,  f:0  },
+  { id:72, name:"Milo (hot/cold)",               cat:"Drinks",      cal:120, p:3,  c:20, f:3  },
+  { id:73, name:"Milo Dinosaur",                 cat:"Drinks",      cal:180, p:4,  c:32, f:4  },
+  { id:74, name:"Sugarcane Juice",               cat:"Drinks",      cal:120, p:0,  c:30, f:0  },
+  { id:75, name:"Fresh Coconut Water",           cat:"Drinks",      cal:60,  p:1,  c:14, f:1  },
+  { id:76, name:"Barley Water",                  cat:"Drinks",      cal:80,  p:1,  c:18, f:0  },
+  { id:77, name:"Bandung (rose milk)",           cat:"Drinks",      cal:150, p:3,  c:28, f:3  },
+  { id:78, name:"Yakult",                        cat:"Drinks",      cal:50,  p:1,  c:12, f:0  },
+  { id:79, name:"Grilled Chicken Breast (100g)", cat:"Proteins",    cal:165, p:31, c:0,  f:4  },
+  { id:80, name:"Steamed Tofu (100g)",           cat:"Proteins",    cal:76,  p:8,  c:2,  f:4  },
+  { id:81, name:"Pan-seared Salmon (100g)",      cat:"Proteins",    cal:208, p:20, c:0,  f:13 },
+  { id:82, name:"Lean Beef cooked (100g)",       cat:"Proteins",    cal:215, p:26, c:0,  f:12 },
+  { id:83, name:"Tuna canned in water (100g)",   cat:"Proteins",    cal:116, p:26, c:0,  f:1  },
+  { id:84, name:"Prawns boiled (100g)",          cat:"Proteins",    cal:99,  p:24, c:0,  f:1  },
+  { id:85, name:"Hard Boiled Egg (1 pc)",        cat:"Proteins",    cal:78,  p:6,  c:1,  f:5  },
+  { id:86, name:"Greek Yoghurt low-fat (100g)",  cat:"Proteins",    cal:59,  p:10, c:3,  f:1  },
+  { id:87, name:"Whey Protein Shake (1 scoop)",  cat:"Proteins",    cal:120, p:25, c:3,  f:2  },
+  { id:88, name:"Edamame shelled (100g)",        cat:"Proteins",    cal:121, p:11, c:9,  f:5  },
+  { id:89, name:"Ayam Penyet with rice",         cat:"Malay",       cal:580, p:38, c:52, f:22 },
+  { id:90, name:"Murtabak (chicken)",            cat:"Malay",       cal:620, p:28, c:68, f:24 },
+  { id:91, name:"Rendang Chicken (100g)",        cat:"Malay",       cal:195, p:20, c:6,  f:10 },
+  { id:92, name:"Beef Rendang (100g)",           cat:"Malay",       cal:195, p:22, c:5,  f:10 },
+  { id:93, name:"Soto Ayam",                     cat:"Malay",       cal:350, p:28, c:32, f:12 },
+  { id:94, name:"Lontong",                       cat:"Malay",       cal:450, p:14, c:68, f:14 },
+  { id:95, name:"Nasi Padang (3 items)",         cat:"Malay",       cal:620, p:28, c:72, f:22 },
+  { id:96, name:"Western Set (grilled chicken)", cat:"Western",     cal:720, p:42, c:58, f:32 },
+  { id:97, name:"Chicken Chop with rice",        cat:"Western",     cal:680, p:38, c:62, f:28 },
+  { id:98, name:"Fish & Chips",                  cat:"Western",     cal:760, p:34, c:68, f:36 },
+  { id:99, name:"Grilled Salmon cafe",           cat:"Western",     cal:520, p:40, c:18, f:30 },
+  { id:100,name:"Acai Bowl",                     cat:"Western",     cal:380, p:8,  c:62, f:10 },
+  { id:101,name:"Har Gow (4 pcs)",               cat:"Dim Sum",     cal:240, p:14, c:28, f:8  },
+  { id:102,name:"Siew Mai (4 pcs)",              cat:"Dim Sum",     cal:260, p:16, c:20, f:12 },
+  { id:103,name:"Char Siew Bao steamed",         cat:"Dim Sum",     cal:190, p:8,  c:30, f:5  },
+  { id:104,name:"Char Siew Bao baked",           cat:"Dim Sum",     cal:220, p:8,  c:34, f:7  },
+  { id:105,name:"Chee Cheong Fun (plain)",       cat:"Dim Sum",     cal:200, p:4,  c:38, f:4  },
+  { id:106,name:"Ice Kachang",                   cat:"Desserts",    cal:200, p:2,  c:45, f:2  },
+  { id:107,name:"Chendol",                       cat:"Desserts",    cal:260, p:3,  c:50, f:6  },
+  { id:108,name:"Durian (1 seed ~50g)",          cat:"Desserts",    cal:60,  p:1,  c:12, f:2  },
+  { id:109,name:"Tau Huay (soft tofu dessert)",  cat:"Desserts",    cal:120, p:6,  c:20, f:2  },
+  { id:110,name:"Red Bean Soup",                 cat:"Desserts",    cal:180, p:5,  c:36, f:2  },
+];
 
-    if(fl.length>0){
-      ctx+='\n## FOOD LOG TODAY\n';
-      fl.forEach(function(f,i){ctx+=(i+1)+'. '+f.name+' — '+f.calories+'cal (P:'+f.protein+' C:'+f.carbs+' F:'+f.fat+')\n'});
-    }
+const CATS = ["All", ...new Set(DB.map(d => d.cat))];
 
-    if(meas&&(meas.waist||meas.chest||meas.hips)){
-      ctx+='\n## BODY MEASUREMENTS\n';
-      if(meas.waist)ctx+='Waist: '+meas.waist+'cm | ';
-      if(meas.chest)ctx+='Chest: '+meas.chest+'cm | ';
-      if(meas.hips)ctx+='Hips: '+meas.hips+'cm | ';
-      if(meas.arms)ctx+='Arms: '+meas.arms+'cm | ';
-      if(meas.thighs)ctx+='Thighs: '+meas.thighs+'cm';
-      ctx+='\n';
-    }
-
-    if(notes) ctx+='\n## USER\'S DAILY NOTES\n"'+notes+'"\n';
-
-    return ctx;
-  },
-
-  // The master system prompt that makes Blaze world-class
-  systemPrompt(ctx){
-    return 'You are Blaze, an elite AI weight loss coach inside the SHED app. You are warm but direct, evidence-based, and deeply personal. You are the kind of coach people pay $200/hour for.\n\n'+
-    '## YOUR COACHING PHILOSOPHY\n'+
-    '- Weight loss is a SYSTEM, not willpower. Build sustainable habits.\n'+
-    '- Track patterns, not just numbers. Connect sleep, stress, food, and weight.\n'+
-    '- Celebrate small wins genuinely. A 0.1kg loss IS progress.\n'+
-    '- Never shame. Reframe setbacks as data points, not failures.\n'+
-    '- Be specific and actionable. Never give vague advice like "eat healthier."\n'+
-    '- When giving calorie/nutrition advice, use their TDEE and actual food log data.\n'+
-    '- Proactively notice things in their data (low water, skipped meals, sleep deficit, etc.)\n\n'+
-    '## YOUR KNOWLEDGE\n'+
-    '- You understand Singapore food culture deeply: hawker centres, kopitiams, zi char, mixed rice, mala, bubble tea, kaya toast, prata, nasi lemak, chicken rice, laksa, ban mian, etc.\n'+
-    '- You can estimate calories for local SG foods accurately.\n'+
-    '- You know that SG portions and food environments present unique challenges.\n'+
-    '- You understand the tropical climate (hydration needs are higher).\n'+
-    '- You are trained in evidence-based nutrition science, CICO, macros, metabolic adaptation, and behavioral psychology.\n'+
-    '- You understand that aggressive deficits lead to muscle loss and metabolic adaptation. A 500-750 cal deficit is ideal for sustainable loss.\n\n'+
-    '## RESPONSE STYLE\n'+
-    '- Keep responses conversational and warm, 2-5 sentences usually.\n'+
-    '- Use their name naturally (not every message).\n'+
-    '- Give ONE clear action item when possible.\n'+
-    '- Reference their actual data when possible.\n'+
-    '- Ask follow-up questions to understand their situation better.\n'+
-    '- Use emojis sparingly and naturally, not excessively.\n'+
-    '- If they share a struggle, validate first, then strategize.\n'+
-    '- If they share a win, celebrate genuinely, then build momentum.\n'+
-    '- Give specific SG-friendly food swaps when discussing nutrition (e.g. "swap the char kway teow for a thunder tea rice — similar satisfaction, half the calories")\n'+
-    '- When they ask about meals, consider what is practical and available in Singapore.\n\n'+
-    '## PROACTIVE COACHING\n'+
-    '- If water intake is low, mention it naturally.\n'+
-    '- If calories seem too low (<1200) or too high, flag it gently.\n'+
-    '- If sleep is under 6 hours, connect it to weight loss (cortisol, hunger hormones).\n'+
-    '- If there is no exercise logged, suggest something achievable.\n'+
-    '- If the person seems discouraged, shift focus to non-scale victories.\n'+
-    '- Track their weekly patterns and give end-of-day summaries when asked.\n\n'+
-    '## CURRENT USER DATA\n'+ctx+
-    '\n## IMPORTANT\n'+
-    '- Be their thinking partner, not just an answer machine.\n'+
-    '- Every response should make them feel seen, understood, and capable.\n'+
-    '- You are not a doctor. For medical concerns, recommend they see one.\n'+
-    '- Never recommend extreme diets, diet pills, or <1200 cal/day.\n'+
-    '- Adapt your tone to theirs — if they are casual, be casual. If serious, match it.';
-  },
-
-  async callWithHistory(systemPrompt, messages){
-    try {
-      const apiMsgs = messages.map(function(m){return {role:m.r==='u'?'user':'assistant',content:m.t}});
-      const r = await fetch('/api/ai',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({system:systemPrompt, messages:apiMsgs})
-      });
-      if(!r.ok){console.error('AI API error:',r.status);return null;}
-      const d = await r.json();
-      return d&&d.content&&d.content[0]&&d.content[0].text?d.content[0].text:null;
-    } catch(e){console.error('AI call failed:',e);return null;}
-  },
-
-  async call(prompt){
-    try {
-      const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}]})});
-      if(!r.ok){console.error('AI API error:',r.status,await r.text());return null;}
-      const d = await r.json();
-      return d&&d.content&&d.content[0]&&d.content[0].text?d.content[0].text:null;
-    } catch(e){console.error('AI call failed:',e);return null;}
-  },
-
-  async motivation(ctx){
-    return await this.call('You are Blaze, elite weight loss coach. Based on this data:\n\n'+ctx+'\n\nGive a personalized, specific motivational message in 2-3 sentences. Reference their actual numbers. Make them feel seen and fired up. If there is something to celebrate (streak, weight lost, good food choices), call it out. If there is something to improve (low water, no exercise), weave it in encouragingly. Be warm and real, not cheesy.')||'Every day you show up is a day you win. Let\'s make today count. 🔥';
-  },
-
-  async meal(cals,prefs,ctx){
-    const t=await this.call('You are a nutritionist in Singapore. Based on this user data:\n\n'+ctx+'\n\nSuggest a meal under '+cals+' cal'+(prefs?', preferences: '+prefs:'')+'. Prioritize meals easily available in Singapore (hawker, home-cooked, or grab-and-go). Return ONLY JSON: {"name":"Name","calories":0,"protein":"0g","carbs":"0g","fat":"0g","description":"Why this meal works for them specifically.","ingredients":["a","b"]}');
-    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:"Thunder Tea Rice",calories:380,protein:"18g",carbs:"52g",fat:"8g",description:"High fiber, low fat, packed with nutrients.",ingredients:["rice","vegetables","tofu","tea paste"]}}
-  },
-
-  async workout(level,dur,ctx){
-    const t=await this.call('You are a personal trainer. User data:\n\n'+ctx+'\n\nCreate a '+dur+'-min '+level+' fat-burning workout suitable for someone at their current weight. Exercises should be joint-friendly and doable at home or in a small space. Return ONLY JSON: {"name":"Name","duration":'+dur+',"calories_est":0,"exercises":[{"name":"Ex","reps":"12 reps or 30 sec","rest":"30 sec"}]} Include 4-6 exercises. Be specific with form cues in the exercise name if needed.');
-    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:"Home Fat Blast",duration:dur,calories_est:200,exercises:[{name:"March in Place (knees high)",reps:"60 sec",rest:"15 sec"},{name:"Wall Push-ups",reps:"12 reps",rest:"30 sec"},{name:"Chair Squats (sit to stand)",reps:"12 reps",rest:"30 sec"},{name:"Standing Side Bends",reps:"15 each side",rest:"20 sec"},{name:"Plank (or knee plank)",reps:"30 sec",rest:"30 sec"}]}}
-  },
-
-  async analyzeMeal(desc,ctx){
-    const t=await this.call('You are a Singapore-based nutritionist. Estimate nutrition for: "'+desc+'". Consider typical Singapore portions and preparation methods. If it is a local dish, use accurate local portion data. Return ONLY JSON: {"name":"'+desc+'","calories":0,"protein":"0g","carbs":"0g","fat":"0g"}');
-    try{return JSON.parse((t||'').replace(/```json|```/g,'').trim())}catch{return{name:desc,calories:300,protein:"15g",carbs:"30g",fat:"10g"}}
-  }
-};
-
-// ─── Small Components ───
-function MiniChart({data, width=260, height=80, color="var(--ember)"}){
-  if(!data||data.length<2) return null;
-  const mn=Math.min(...data)-2, mx=Math.max(...data)+2, rng=mx-mn||1;
-  const pts=data.map((v,i)=> (i/(data.length-1))*width+','+(height-((v-mn)/rng)*height) ).join(' ');
-  const gid='g'+Math.random().toString(36).slice(2,6);
+// ─── SHARED COMPONENTS ───────────────────────────────────────────
+function Chip({ active, onClick, children }) {
   return (
-    <svg width="100%" viewBox={'0 0 '+width+' '+height} preserveAspectRatio="none" style={{overflow:'visible'}}>
-      <defs><linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity="0.3"/><stop offset="100%" stopColor={color} stopOpacity="0"/></linearGradient></defs>
-      <polygon points={'0,'+height+' '+pts+' '+width+','+height} fill={'url(#'+gid+')'}/>
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx={width} cy={height-((data[data.length-1]-mn)/rng)*height} r="4" fill={color}/>
-    </svg>
+    <button onClick={onClick} style={{
+      padding: "5px 11px", borderRadius: "20px", fontSize: "12px", fontWeight: 500,
+      cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "all 0.15s",
+      background: active ? ACCENT : "var(--color-background-secondary)",
+      color: active ? ACCENT_FG : "var(--color-text-secondary)",
+      border: active ? `0.5px solid ${ACCENT}` : "0.5px solid var(--color-border-tertiary)",
+    }}>{children}</button>
   );
 }
 
-function ProgressRing({progress, size=120, stroke=8, color="var(--ember)"}){
-  const r=(size-stroke)/2, c=2*Math.PI*r, o=c-(Math.min(progress,100)/100)*c;
+function Card({ children, style = {}, accent }) {
   return (
-    <svg width={size} height={size} style={{transform:'rotate(-90deg)'}}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke}/>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={c} strokeDashoffset={o} strokeLinecap="round" style={{transition:'stroke-dashoffset 1s ease'}}/>
-    </svg>
+    <div style={{
+      background: "var(--color-background-primary)",
+      border: accent ? `1.5px solid ${ACCENT}` : "0.5px solid var(--color-border-tertiary)",
+      borderRadius: "var(--border-radius-lg)",
+      padding: "1rem 1.25rem",
+      marginBottom: "12px",
+      ...style,
+    }}>{children}</div>
   );
 }
 
-function Toast({msg, onClose}){
-  useEffect(()=>{const t=setTimeout(onClose,3000);return()=>clearTimeout(t)},[]);
-  return <div style={{position:'fixed',top:20,left:'50%',transform:'translateX(-50%)',zIndex:9999,padding:'14px 28px',borderRadius:14,fontSize:14,fontWeight:500,animation:'fadeUp .4s',background:'linear-gradient(135deg,var(--ember),var(--flame))',color:'#fff',fontFamily:"'Sora'"}}>{msg}</div>;
+function Btn({ onClick, disabled, children, full, ghost }) {
+  return (
+    <button onClick={onClick} disabled={disabled} style={{
+      padding: "10px 16px", borderRadius: "var(--border-radius-md)", fontWeight: 500,
+      fontSize: "13px", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.4 : 1,
+      background: ghost ? "var(--color-background-secondary)" : ACCENT,
+      color: ghost ? "var(--color-text-primary)" : ACCENT_FG,
+      border: ghost ? "0.5px solid var(--color-border-tertiary)" : "none",
+      width: full ? "100%" : "auto", transition: "opacity 0.15s",
+    }}>{children}</button>
+  );
 }
 
-function Sheet({open, onClose, title, children}){
-  if(!open) return null;
+function Spinner() {
   return (
-    <div style={{position:'fixed',inset:0,zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
-      <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.6)'}} onClick={onClose}/>
-      <div style={{position:'relative',width:'100%',maxWidth:480,background:'var(--smoke)',borderRadius:'24px 24px 0 0',padding:'28px 24px 36px',animation:'fadeUp .35s',maxHeight:'85vh',overflowY:'auto'}}>
-        <div style={{width:40,height:4,borderRadius:2,background:'rgba(255,255,255,.15)',margin:'0 auto 20px'}}/>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
-          {title && <h3 style={{fontSize:18,fontWeight:700}}>{title}</h3>}
-          <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',color:'var(--bone)',marginLeft:'auto'}}><Ic d={P.x} s={20}/></button>
-        </div>
-        {children}
-      </div>
+    <div style={{ textAlign: "center", padding: "28px 0", color: "var(--color-text-secondary)" }}>
+      <i className="ti ti-loader" style={{ fontSize: "20px", display: "block", marginBottom: "6px" }} aria-hidden></i>
+      <span style={{ fontSize: "12px" }}>Generating with AI...</span>
     </div>
   );
 }
 
-// ─── MAIN APP ───
-function App(){
-  const hasProfile = DB.l('profile',null) && DB.l('profile',{}).name;
-  const [scr, setScr] = useState(hasProfile ? 'dash' : 'splash');
-  const [toast, setToast] = useState(null);
-  const [notifs, setNotifs] = useState(false);
-  const [ob, setOb] = useState(0);
-  const [pro, setPro] = useState(()=>DB.l('profile',{name:'',currentWeight:'',goalWeight:'',unit:'kg',height:'',heightUnit:'cm',activityLevel:'moderate',motivation:''}));
-  const [wh, setWh] = useState(()=>DB.l('wh',[]));
-  const [dl, setDl] = useState(()=>{
-    const today=new Date().toDateString(), saved=DB.l('dl',null);
-    return saved&&saved._d===today ? saved : {water:0,calories:0,steps:0,sleep:0,exercise:0,_d:today};
-  });
-  const [fl, setFl] = useState(()=>DB.l('fl',[]));
-  const [meas, setMeas] = useState(()=>DB.l('meas',{waist:'',chest:'',hips:'',arms:'',thighs:''}));
-  const [streak] = useState(()=>DB.l('streak',1));
-  const [notes, setNotes] = useState(()=>DB.l('notes',''));
-  const [mot, setMot] = useState('');
-  const [motL, setMotL] = useState(false);
-  const [mealS, setMealS] = useState(null);
-  const [mealL, setMealL] = useState(false);
-  const [wk, setWk] = useState(null);
-  const [wkL, setWkL] = useState(false);
-  const [msgs, setMsgs] = useState(()=>DB.l('msgs',[]));
-  const ciRef = useRef(null);
-  const [ciBtn, setCiBtn] = useState(false);
-  const [cL, setCL] = useState(false);
-  const [md, setMd] = useState(null);
-  const [mi, setMi] = useState({});
-  const [afL, setAfL] = useState(false);
-  const chatEnd = useRef(null);
+function AIOut({ text }) {
+  return (
+    <Card style={{ fontSize: "13px", lineHeight: 1.9, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+      {text}
+    </Card>
+  );
+}
 
-  // persist
-  useEffect(()=>{if(pro.name)DB.s('profile',pro)},[pro]);
-  useEffect(()=>{if(wh.length)DB.s('wh',wh)},[wh]);
-  useEffect(()=>{DB.s('dl',dl)},[dl]);
-  useEffect(()=>{DB.s('fl',fl)},[fl]);
-  useEffect(()=>{DB.s('meas',meas)},[meas]);
-  useEffect(()=>{DB.s('notes',notes)},[notes]);
-  useEffect(()=>{DB.s('msgs',msgs)},[msgs]);
+function SectionLabel({ children }) {
+  return <div style={{ fontSize: "11px", color: "var(--color-text-secondary)", letterSpacing: "0.6px", fontWeight: 500, marginBottom: "6px", textTransform: "uppercase" }}>{children}</div>;
+}
 
-  const go = useCallback(s=>setScr(s),[]);
-  const tt = m=>setToast(m);
+function BackBtn({ onClick }) {
+  return (
+    <button onClick={onClick} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", padding: "0 0 12px", fontSize: "13px", display: "flex", alignItems: "center", gap: "4px" }}>
+      <i className="ti ti-arrow-left" aria-hidden></i> Back
+    </button>
+  );
+}
 
-  useEffect(()=>{if(scr==='splash'){const t=setTimeout(()=>setScr(hasProfile?'dash':'ob'),2500);return()=>clearTimeout(t)}},[scr]);
-  useEffect(()=>{if(scr==='dash'&&!mot)loadMot()},[scr]);
-  useEffect(()=>{if(chatEnd.current)chatEnd.current.scrollIntoView({behavior:'smooth'})},[msgs]);
+// ─── PROFILE SETUP ───────────────────────────────────────────────
+function ProfileSetup({ onDone, existing, onBack }) {
+  const blank = { name: "", weight: "", height: "", bodyFat: "", goal: "cut", trainingDays: "3", equipment: "gym" };
+  const [f, setF] = useState(existing || blank);
+  const u = (k, v) => setF(p => ({ ...p, [k]: v }));
+  const ok = f.name && f.weight && f.height && f.bodyFat;
 
-  const cw=parseFloat(pro.currentWeight)||0, gw=parseFloat(pro.goalWeight)||0;
-  const lost=wh.length>1?Math.round((wh[0]-wh[wh.length-1])*10)/10:0;
-  const pct=wh.length>1&&gw?Math.min(100,Math.max(0,Math.round(((wh[0]-wh[wh.length-1])/(wh[0]-gw))*100))):0;
-  const uc={name:pro.name||'Champ',cw:pro.currentWeight,gw:pro.goalWeight,unit:pro.unit,lost:Math.abs(lost),streak};
-  const fullCtx=AI.buildContext(pro,dl,fl,wh,meas,notes,streak);
+  return (
+    <div style={{ padding: "1.5rem 1rem" }}>
+      {onBack && <BackBtn onClick={onBack} />}
+      <div style={{ marginBottom: "1.5rem" }}>
+        <div style={{ fontSize: "11px", color: ACCENT, fontWeight: 500, letterSpacing: "1px", marginBottom: "4px" }}>SHED</div>
+        <h2 style={{ margin: "0 0 4px", fontSize: "22px", fontWeight: 500 }}>{existing ? "Edit profile" : "Your transformation starts here"}</h2>
+        <p style={{ margin: 0, fontSize: "13px", color: "var(--color-text-secondary)" }}>Singapore-first. Built around your body.</p>
+      </div>
 
-  const loadMot=async()=>{setMotL(true);setMot(await AI.motivation(fullCtx));setMotL(false)};
+      <div style={{ marginBottom: "12px" }}>
+        <SectionLabel>Name</SectionLabel>
+        <input value={f.name} onChange={e => u("name", e.target.value)} placeholder="e.g. Alex" style={{ width: "100%", boxSizing: "border-box" }} />
+      </div>
 
-  const sendChat=async()=>{
-    var val=ciRef.current?ciRef.current.value:'';
-    if(!val.trim()||cL)return;
-    const m=val.trim();
-    if(ciRef.current)ciRef.current.value='';
-    setCiBtn(false);
-    const newMsgs=[].concat(msgs,[{r:'u',t:m}]);
-    setMsgs(newMsgs);setCL(true);
-    var sysPrompt=AI.systemPrompt(fullCtx);
-    var historyToSend=newMsgs.slice(-20);
-    var reply=await AI.callWithHistory(sysPrompt,historyToSend);
-    if(!reply) reply='I am having trouble connecting right now. Try again in a moment! 🔥';
-    setMsgs(function(p){return [].concat(p,[{r:'a',t:reply}])});setCL(false);
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
+        <div>
+          <SectionLabel>Weight (kg)</SectionLabel>
+          <input type="number" value={f.weight} onChange={e => u("weight", e.target.value)} placeholder="75" style={{ width: "100%", boxSizing: "border-box" }} />
+        </div>
+        <div>
+          <SectionLabel>Height (cm)</SectionLabel>
+          <input type="number" value={f.height} onChange={e => u("height", e.target.value)} placeholder="170" style={{ width: "100%", boxSizing: "border-box" }} />
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "12px" }}>
+        <SectionLabel>Body fat % (rough estimate)</SectionLabel>
+        <input type="number" value={f.bodyFat} onChange={e => u("bodyFat", e.target.value)} placeholder="20" style={{ width: "100%", boxSizing: "border-box" }} />
+      </div>
+
+      <div style={{ marginBottom: "12px" }}>
+        <SectionLabel>Goal</SectionLabel>
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+          {[["cut", "Aggressive cut"], ["bulk", "Lean bulk"], ["recomp", "Recomp"]].map(([v, l]) => (
+            <Chip key={v} active={f.goal === v} onClick={() => u("goal", v)}>{l}</Chip>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "1.5rem" }}>
+        <div>
+          <SectionLabel>Training days/week</SectionLabel>
+          <select value={f.trainingDays} onChange={e => u("trainingDays", e.target.value)} style={{ width: "100%" }}>
+            {[2, 3, 4, 5, 6].map(d => <option key={d} value={d}>{d} days</option>)}
+          </select>
+        </div>
+        <div>
+          <SectionLabel>Equipment</SectionLabel>
+          <select value={f.equipment} onChange={e => u("equipment", e.target.value)} style={{ width: "100%" }}>
+            <option value="gym">Full gym</option>
+            <option value="condo">Condo gym</option>
+            <option value="hdb">HDB gym</option>
+            <option value="home">Home only</option>
+          </select>
+        </div>
+      </div>
+
+      <Btn onClick={() => ok && onDone(f)} disabled={!ok} full>
+        {existing ? "Save changes" : "Start my transformation →"}
+      </Btn>
+    </div>
+  );
+}
+
+// ─── TAB 1: PROGRAMME ────────────────────────────────────────────
+function ProgrammeTab({ profile }) {
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
+  const goalMap = { cut: "aggressive fat loss", bulk: "lean muscle gain", recomp: "body recomposition" };
+
+  const gen = async () => {
+    setLoading(true); setResult("");
+    const txt = await askClaude(
+      "You are an elite strength and conditioning coach. Format with clear section headers. Compound movements always listed first. Be specific with weights, reps, progression logic.",
+      `Design a 12-week Hypertrophy & Strength programme for ${profile.name}: ${profile.weight}kg, ${profile.height}cm, ~${profile.bodyFat}% body fat. Training: ${profile.trainingDays} days/week on ${profile.equipment}. Goal: ${goalMap[profile.goal]}.
+
+Include:
+1. Weekly split overview (which muscles each day)
+2. Full exercise list with sets x reps for each day
+3. Double progression system (exactly when to add weight)
+4. Phase breakdown: Foundation (wk1-4), Accumulation (wk5-8), Intensification (wk9-12)
+5. Deload rules and plateau protocol
+6. Singapore-specific gym tip for this profile`, 1500
+    );
+    setResult(txt); setLoading(false);
   };
 
-  // ─── SPLASH ───
-  if(scr==='splash') return (
-    <div style={{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'radial-gradient(ellipse at center,var(--smoke),var(--coal) 70%)',position:'relative'}}>
-      <div style={{position:'absolute',inset:0,background:'radial-gradient(circle at 50% 40%,rgba(255,107,53,.08),transparent 60%)'}}/>
-      <div className="ag" style={{width:100,height:100,borderRadius:28,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:28}}><Ic d={P.flame} s={48} c="white"/></div>
-      <h1 className="serif au" style={{fontSize:52,background:'linear-gradient(135deg,var(--bone),var(--ember))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>SHED</h1>
-      <p className="au" style={{fontSize:14,color:'rgba(255,255,255,.6)',letterSpacing:'.15em',textTransform:'uppercase',marginTop:8,animationDelay:'.2s'}}>Drop the weight. Keep the fire.</p>
-    </div>
-  );
-
-  // ─── ONBOARDING ───
-  if(scr==='ob'){
-    const steps=[
-      {t:'What should we call you?',s:'Let\'s make this personal.',c:<input className="inf" placeholder="Your name" value={pro.name} onChange={e=>setPro(p=>({...p,name:e.target.value}))} style={{fontSize:18,textAlign:'center',padding:18}}/>,v:()=>pro.name.trim().length>0},
-      {t:'Where are you starting?',s:'No judgment.',c:(
-        <div style={{display:'flex',flexDirection:'column',gap:16}}>
-          <div style={{display:'flex',gap:12}}><input className="inf" type="number" placeholder="Current weight" value={pro.currentWeight} onChange={e=>setPro(p=>({...p,currentWeight:e.target.value}))} style={{flex:1}}/><select className="inf" value={pro.unit} onChange={e=>setPro(p=>({...p,unit:e.target.value}))} style={{width:80}}><option value="kg">kg</option><option value="lbs">lbs</option></select></div>
-          <div style={{display:'flex',gap:12}}><input className="inf" type="number" placeholder="Height" value={pro.height} onChange={e=>setPro(p=>({...p,height:e.target.value}))} style={{flex:1}}/><select className="inf" value={pro.heightUnit} onChange={e=>setPro(p=>({...p,heightUnit:e.target.value}))} style={{width:80}}><option value="cm">cm</option><option value="ft">ft</option></select></div>
-        </div>),v:()=>pro.currentWeight&&pro.height},
-      {t:'What\'s the target?',s:'Dream big.',c:(
-        <div style={{display:'flex',flexDirection:'column',gap:16}}>
-          <div style={{display:'flex',gap:12,alignItems:'center'}}><input className="inf" type="number" placeholder="Goal weight" value={pro.goalWeight} onChange={e=>setPro(p=>({...p,goalWeight:e.target.value}))} style={{flex:1,fontSize:18,textAlign:'center'}}/><span style={{color:'rgba(255,255,255,.6)'}}>{pro.unit}</span></div>
-          {pro.currentWeight&&pro.goalWeight&&<div className="cd au" style={{textAlign:'center',padding:20}}><p style={{fontSize:13,color:'rgba(255,255,255,.6)',marginBottom:8}}>You want to shed</p><p className="serif" style={{fontSize:42,color:'var(--ember)'}}>{Math.abs(parseFloat(pro.currentWeight)-parseFloat(pro.goalWeight)).toFixed(1)}<span style={{fontSize:18,color:'rgba(255,255,255,.6)'}}> {pro.unit}</span></p></div>}
-        </div>),v:()=>pro.goalWeight},
-      {t:'How active are you?',s:'Be honest.',c:(
-        <div style={{display:'flex',flexDirection:'column',gap:12}}>
-          {[{v:'sedentary',l:'Sedentary',d:'Desk job'},{v:'light',l:'Lightly Active',d:'Light walks'},{v:'moderate',l:'Moderate',d:'Exercise 3-4x/week'},{v:'active',l:'Very Active',d:'Intense 5-6x/week'}].map(lv=>(
-            <button key={lv.v} onClick={()=>setPro(p=>({...p,activityLevel:lv.v}))} className="cd" style={{textAlign:'left',cursor:'pointer',border:pro.activityLevel===lv.v?'2px solid var(--ember)':'1px solid rgba(255,255,255,.06)',background:pro.activityLevel===lv.v?'rgba(255,107,53,.06)':'transparent'}}><p style={{fontWeight:600}}>{lv.l}</p><p style={{fontSize:13,color:'rgba(255,255,255,.6)',marginTop:4}}>{lv.d}</p></button>
-          ))}
-        </div>),v:()=>true}
-    ];
-    const st=steps[ob];
-    return(
-      <div style={{maxWidth:480,margin:'0 auto',minHeight:'100vh',display:'flex',flexDirection:'column',background:'var(--coal)'}}>
-        <div style={{padding:'24px 24px 0'}}><div style={{display:'flex',gap:6,marginBottom:40}}>{steps.map((_,i)=><div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=ob?'var(--ember)':'rgba(255,255,255,.1)'}}/>)}</div></div>
-        <div className="au" key={ob} style={{flex:1,padding:'0 24px',display:'flex',flexDirection:'column'}}>
-          <h2 className="serif" style={{fontSize:32,lineHeight:1.2,marginBottom:8}}>{st.t}</h2>
-          <p style={{fontSize:15,color:'rgba(255,255,255,.6)',marginBottom:36}}>{st.s}</p>
-          <div style={{flex:1}}>{st.c}</div>
-        </div>
-        <div style={{padding:24,display:'flex',gap:12}}>
-          {ob>0&&<button className="bs" onClick={()=>setOb(o=>o-1)} style={{padding:'14px 24px',width:'auto'}}><Ic d={P.back} s={18}/></button>}
-          <button className="bp" disabled={!st.v()} onClick={()=>{
-            if(!st.v())return;
-            if(ob<steps.length-1){setOb(o=>o+1)}
-            else{
-              const c=parseFloat(pro.currentWeight);
-              if(wh.length===0){setWh([c]);}
-              go('dash');
-            }
-          }}>{ob<steps.length-1?'Continue':'Start Shedding 🔥'}</button>
-        </div>
-      </div>
-    );
-  }
-
-  // ─── TABS ───
-  const tabs=[{id:'dash',l:'Home',p:P.home},{id:'coach',l:'AI Coach',p:P.sparkle},{id:'prog',l:'Progress',p:P.chart},{id:'prof',l:'Profile',p:P.user}];
-  const showTabs=['dash','coach','prog','prof'].includes(scr);
-
-  return(
-    <div style={{maxWidth:480,margin:'0 auto',minHeight:'100vh',background:'var(--coal)',position:'relative'}}>
-      {toast&&<Toast msg={toast} onClose={()=>setToast(null)}/>}
-
-      {/* MODALS */}
-      <Sheet open={md==='water'} onClose={()=>setMd(null)} title="Log Water 💧">
-        <div style={{display:'flex',justifyContent:'center',gap:6,marginBottom:24}}>{Array.from({length:8}).map((_,i)=>(<div key={i} onClick={()=>setMi({water:i+1})} style={{width:34,height:48,borderRadius:10,background:i<((nn(mi.water,dl.water)))?'rgba(52,152,219,.25)':'rgba(255,255,255,.04)',border:'1px solid '+(i<((nn(mi.water,dl.water)))?'rgba(52,152,219,.5)':'rgba(255,255,255,.08)'),cursor:'pointer',display:'flex',alignItems:'flex-end',justifyContent:'center',paddingBottom:6}}>{i<((nn(mi.water,dl.water)))&&<Ic d={P.water} s={16} c="#3498DB"/>}</div>))}</div>
-        <div style={{display:'flex',alignItems:'center',gap:20,justifyContent:'center',marginBottom:20}}><button className="sbtn" onClick={()=>setMi(p=>({water:Math.max(0,((nn(p.water,dl.water)))-1)}))}>−</button><div><span className="serif" style={{fontSize:48,color:'#3498DB'}}>{(nn(mi.water,dl.water))}</span><span style={{fontSize:16,color:'rgba(255,255,255,.55)',marginLeft:6}}>glasses</span></div><button className="sbtn" onClick={()=>setMi(p=>({water:Math.min(20,((nn(p.water,dl.water)))+1)}))}>+</button></div>
-        <input className="inf" type="number" placeholder="Or type exact..." onChange={e=>setMi({water:parseInt(e.target.value)||0})} style={{marginBottom:16}}/>
-        <button className="bp" onClick={()=>{setDl(p=>({...p,water:(nn(mi.water,p.water))}));setMd(null);tt('Water: '+((nn(mi.water,dl.water)))+' glasses 💧')}}>Save</button>
-      </Sheet>
-
-      <Sheet open={md==='cal'} onClose={()=>setMd(null)} title="Log Calories 🍽️">
-        <div style={{display:'flex',alignItems:'center',gap:20,justifyContent:'center',marginBottom:20}}><button className="sbtn" onClick={()=>setMi(p=>({cal:Math.max(0,((nn(p.cal,dl.calories)))-50)}))}>−</button><div style={{textAlign:'center'}}><span className="serif" style={{fontSize:48,color:'#E67E22'}}>{(nn(mi.cal,dl.calories))}</span><span style={{fontSize:16,color:'rgba(255,255,255,.55)',marginLeft:6}}>kcal</span></div><button className="sbtn" onClick={()=>setMi(p=>({cal:((nn(p.cal,dl.calories)))+50}))}>+</button></div>
-        <input className="inf" type="number" placeholder="Type exact..." onChange={e=>setMi({cal:parseInt(e.target.value)||0})} style={{marginBottom:12}}/>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:16}}>{[{l:'Snack',c:150},{l:'Light',c:350},{l:'Full',c:600}].map(q=>(<button key={q.l} className="cd" onClick={()=>setMi(p=>({cal:((nn(p.cal,dl.calories)))+q.c}))} style={{cursor:'pointer',textAlign:'center',padding:14}}><p style={{fontSize:18,fontWeight:700,color:'#E67E22'}}>{q.c}</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>{q.l}</p></button>))}</div>
-        <button className="bp" onClick={()=>{setDl(p=>({...p,calories:(nn(mi.cal,p.calories))}));setMd(null);tt('Calories: '+((nn(mi.cal,dl.calories))))}}>Save</button>
-      </Sheet>
-
-      <Sheet open={md==='steps'} onClose={()=>setMd(null)} title="Log Steps 🚶">
-        <div style={{display:'flex',alignItems:'center',gap:20,justifyContent:'center',marginBottom:20}}><button className="sbtn" onClick={()=>setMi(p=>({steps:Math.max(0,((nn(p.steps,dl.steps)))-500)}))}>−</button><div style={{textAlign:'center'}}><span className="serif" style={{fontSize:48,color:'#2ECC71'}}>{((nn(mi.steps,dl.steps))).toLocaleString()}</span><span style={{fontSize:14,color:'rgba(255,255,255,.55)',marginLeft:6}}>steps</span></div><button className="sbtn" onClick={()=>setMi(p=>({steps:((nn(p.steps,dl.steps)))+500}))}>+</button></div>
-        <input className="inf" type="number" placeholder="Type exact..." onChange={e=>setMi({steps:parseInt(e.target.value)||0})} style={{marginBottom:12}}/>
-        <div style={{display:'flex',gap:8,marginBottom:16}}>{[1000,2500,5000,10000].map(s=>(<button key={s} className="cd" onClick={()=>setMi({steps:s})} style={{flex:1,cursor:'pointer',textAlign:'center',padding:12}}><p style={{fontSize:14,fontWeight:600,color:'#2ECC71'}}>{s>=1000?(s/1000)+'k':s}</p></button>))}</div>
-        <button className="bp" onClick={()=>{setDl(p=>({...p,steps:(nn(mi.steps,p.steps))}));setMd(null);tt('Steps: '+((nn(mi.steps,dl.steps))))}}>Save</button>
-      </Sheet>
-
-      <Sheet open={md==='sleep'} onClose={()=>setMd(null)} title="Log Sleep 🌙">
-        <div style={{display:'flex',alignItems:'center',gap:20,justifyContent:'center',marginBottom:20}}><button className="sbtn" onClick={()=>setMi(p=>({sleep:Math.max(0,((nn(p.sleep,dl.sleep)))-.5)}))}>−</button><div style={{textAlign:'center'}}><span className="serif" style={{fontSize:48,color:'#9B59B6'}}>{((nn(mi.sleep,dl.sleep))).toFixed(1)}</span><span style={{fontSize:16,color:'rgba(255,255,255,.55)',marginLeft:6}}>hrs</span></div><button className="sbtn" onClick={()=>setMi(p=>({sleep:Math.min(24,((nn(p.sleep,dl.sleep)))+.5)}))}>+</button></div>
-        <p style={{fontSize:13,color:'rgba(255,255,255,.55)',marginBottom:10}}>QUALITY</p>
-        <div style={{display:'flex',gap:8,marginBottom:16}}>{['😴 Poor','😐 Fair','😊 Good','🌟 Great'].map(q=>(<button key={q} onClick={()=>setMi(p=>({...p,sq:q}))} className="cd" style={{flex:1,cursor:'pointer',textAlign:'center',padding:10,fontSize:12,border:mi.sq===q?'1px solid #9B59B6':'1px solid rgba(255,255,255,.06)',background:mi.sq===q?'rgba(155,89,182,.1)':'transparent'}}>{q}</button>))}</div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:6}}>Bedtime</p><input className="inf" type="time" value={mi.bed||''} onChange={e=>setMi(p=>({...p,bed:e.target.value}))}/></div><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:6}}>Wake</p><input className="inf" type="time" value={mi.wake||''} onChange={e=>setMi(p=>({...p,wake:e.target.value}))}/></div></div>
-        <button className="bp" onClick={()=>{setDl(p=>({...p,sleep:(nn(mi.sleep,p.sleep))}));setMd(null);tt('Sleep: '+((nn(mi.sleep,dl.sleep))).toFixed(1)+'hrs')}}>Save</button>
-      </Sheet>
-
-      <Sheet open={md==='food'} onClose={()=>setMd(null)} title="Log Food 🍎">
-        <p style={{fontSize:13,color:'rgba(255,255,255,.6)',marginBottom:14}}>Describe what you ate — AI estimates nutrition.</p>
-        <textarea className="inf" placeholder="e.g. 2 eggs, toast with butter" value={mi.fd||''} onChange={e=>setMi(p=>({...p,fd:e.target.value}))} style={{minHeight:80,marginBottom:12}}/>
-        <button className="bp" disabled={!(mi.fd&&mi.fd.trim())||afL} onClick={async()=>{setAfL(true);const r=await AI.analyzeMeal(mi.fd,fullCtx);setAfL(false);setFl(p=>[...p,r]);setDl(p=>({...p,calories:p.calories+r.calories}));setMi({});setMd(null);tt('Logged: '+r.name+' ('+r.calories+' cal)')}} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:20}}><Ic d={P.sparkle} s={16} c="white" f={true}/> {afL?'Analyzing...':'Analyze with AI'}</button>
-        <div style={{borderTop:'1px solid rgba(255,255,255,.06)',paddingTop:20}}><p style={{fontSize:13,color:'rgba(255,255,255,.55)',marginBottom:12}}>OR MANUALLY</p><input className="inf" placeholder="Food name" style={{marginBottom:10}} value={mi.mn||''} onChange={e=>setMi(p=>({...p,mn:e.target.value}))}/><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}><input className="inf" type="number" placeholder="Calories" value={mi.mc||''} onChange={e=>setMi(p=>({...p,mc:e.target.value}))}/><input className="inf" type="number" placeholder="Protein(g)" value={mi.mp||''} onChange={e=>setMi(p=>({...p,mp:e.target.value}))}/><input className="inf" type="number" placeholder="Carbs(g)" value={mi.mcb||''} onChange={e=>setMi(p=>({...p,mcb:e.target.value}))}/><input className="inf" type="number" placeholder="Fat(g)" value={mi.mf||''} onChange={e=>setMi(p=>({...p,mf:e.target.value}))}/></div><button className="bs" onClick={()=>{if(!mi.mn)return;const e={name:mi.mn,calories:parseInt(mi.mc)||0,protein:(mi.mp||0)+'g',carbs:(mi.mcb||0)+'g',fat:(mi.mf||0)+'g'};setFl(p=>[...p,e]);setDl(p=>({...p,calories:p.calories+e.calories}));setMi({});setMd(null);tt('Logged: '+e.name)}}>Log Manually</button></div>
-      </Sheet>
-
-      <Sheet open={md==='exercise'} onClose={()=>setMd(null)} title="Log Exercise 💪">
-        <input className="inf" placeholder="Exercise type" style={{marginBottom:12}} value={mi.et||''} onChange={e=>setMi(p=>({...p,et:e.target.value}))}/>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:6}}>Duration (min)</p><input className="inf" type="number" placeholder="30" value={mi.ed||''} onChange={e=>setMi(p=>({...p,ed:e.target.value}))}/></div><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:6}}>Cal burned</p><input className="inf" type="number" placeholder="200" value={mi.ec||''} onChange={e=>setMi(p=>({...p,ec:e.target.value}))}/></div></div>
-        <p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginBottom:8}}>INTENSITY</p>
-        <div style={{display:'flex',gap:8,marginBottom:16}}>{['Light','Moderate','Intense'].map(lv=>(<button key={lv} onClick={()=>setMi(p=>({...p,ei:lv}))} className="cd" style={{flex:1,cursor:'pointer',textAlign:'center',padding:12,fontSize:13,border:mi.ei===lv?'1px solid var(--flame)':'1px solid rgba(255,255,255,.06)',background:mi.ei===lv?'rgba(255,159,28,.1)':'transparent'}}>{lv}</button>))}</div>
-        <button className="bp" onClick={()=>{if(!mi.et)return;setDl(p=>({...p,exercise:p.exercise+(parseInt(mi.ec)||0)}));setMi({});setMd(null);tt('Logged: '+mi.et+' 💪')}}>Log Exercise</button>
-      </Sheet>
-
-      <Sheet open={md==='weight'} onClose={()=>setMd(null)} title="Log Weight ⚖️">
-        <div style={{textAlign:'center',marginBottom:8}}><ProgressRing progress={pct} size={140} stroke={8}/><p style={{marginTop:-40,marginBottom:24,fontSize:13,color:'rgba(255,255,255,.55)'}}>{pct}% to goal</p></div>
-        <input className="inf" type="number" step="0.1" placeholder={'Weight in '+pro.unit} value={mi.wt||''} onChange={e=>setMi({wt:e.target.value})} style={{fontSize:22,textAlign:'center',padding:18,marginBottom:12}}/>
-        <div style={{display:'flex',gap:8,marginBottom:16}}>{[-0.5,-0.1,0,0.1,0.5].map(d=>(<button key={d} onClick={()=>setMi({wt:String((cw+d).toFixed(1))})} className="cd" style={{flex:1,cursor:'pointer',textAlign:'center',padding:10,fontSize:13}}>{d>0?'+':''}{d}</button>))}</div>
-        <button className="bp" onClick={()=>{const v=parseFloat(mi.wt);if(isNaN(v))return;setWh(p=>[...p,v]);setPro(p=>({...p,currentWeight:String(v)}));setMi({});setMd(null);tt('Weight: '+v+pro.unit+' 🔥')}}>Log Weight 🔥</button>
-      </Sheet>
-
-      <Sheet open={md==='meas'} onClose={()=>setMd(null)} title="Measurements 📏">
-        {[{k:'waist',l:'Waist'},{k:'chest',l:'Chest'},{k:'hips',l:'Hips'},{k:'arms',l:'Arms'},{k:'thighs',l:'Thighs'}].map(m=>(<div key={m.k} style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}><span style={{fontSize:14,width:60,color:'rgba(248,240,227,.6)'}}>{m.l}</span><input className="inf" type="number" step="0.1" placeholder="cm" value={nn(mi['m_'+m.k], meas[m.k]||'')} onChange={e=>setMi(p=>({...p,['m_'+m.k]:e.target.value}))} style={{flex:1}}/></div>))}
-        <button className="bp" style={{marginTop:8}} onClick={()=>{setMeas(p=>({...p,waist:mi.m_waist||p.waist,chest:mi.m_chest||p.chest,hips:mi.m_hips||p.hips,arms:mi.m_arms||p.arms,thighs:mi.m_thighs||p.thighs}));setMi({});setMd(null);tt('Saved! 📏')}}>Save</button>
-      </Sheet>
-
-      <Sheet open={md==='notes'} onClose={()=>setMd(null)} title="Daily Notes 📝">
-        <textarea className="inf" placeholder="How are you feeling?" style={{minHeight:140}} value={(nn(mi.nt,notes))} onChange={e=>setMi({nt:e.target.value})}/>
-        <div style={{display:'flex',flexWrap:'wrap',gap:6,marginTop:12}}>{['😊 Happy','😤 Motivated','😴 Tired','😋 Cravings','💪 Strong'].map(t=>(<button key={t} onClick={()=>setMi(p=>({nt:(p.nt||notes)+' '+t}))} className="tg" style={{cursor:'pointer',background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.08)',color:'var(--bone)'}}>{t}</button>))}</div>
-        <button className="bp" style={{marginTop:16}} onClick={()=>{setNotes(mi.nt||'');setMi({});setMd(null);tt('Saved!')}}>Save</button>
-      </Sheet>
-
-      {/* ═══ DASHBOARD ═══ */}
-      {scr==='dash'&&(<div style={{paddingBottom:90}}>
-        <div style={{padding:'20px 20px 0',display:'flex',justifyContent:'space-between',alignItems:'center'}}><div><p style={{fontSize:13,color:'rgba(255,255,255,.55)',letterSpacing:'.08em'}}>GOOD {new Date().getHours()<12?'MORNING':new Date().getHours()<17?'AFTERNOON':'EVENING'}</p><h1 className="serif" style={{fontSize:28,marginTop:4}}>{pro.name}</h1></div><button onClick={()=>setNotifs(true)} style={{width:42,height:42,borderRadius:14,background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.08)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',position:'relative'}}><Ic d={P.bell} s={20} c="var(--bone)"/><div style={{position:'absolute',top:8,right:8,width:8,height:8,borderRadius:'50%',background:'var(--glow)'}}/></button></div>
-
-        {/* Motivation */}
-        <div style={{padding:'20px 20px 0'}}><div className="cd au" style={{background:'linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,159,28,.04))',border:'1px solid rgba(255,107,53,.15)',padding:20}}><div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}><Ic d={P.flame} s={20} c="var(--ember)"/><span style={{fontSize:22,fontWeight:700,color:'var(--ember)'}}>{streak}</span><span style={{fontSize:13,color:'rgba(255,255,255,.6)'}}>day streak</span><button onClick={loadMot} style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'var(--ember)',fontSize:12,fontFamily:"'Sora'",fontWeight:500,display:'flex',alignItems:'center',gap:4}}><Ic d={P.sparkle} s={14} c="var(--ember)" f={true}/> New</button></div>{motL?<div style={{height:48}}><div style={{width:'70%',height:12,borderRadius:6,background:'linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.1),rgba(255,255,255,.05))',backgroundSize:'200% 100%',animation:'shimmer 1.5s infinite'}}/></div>:<p style={{fontSize:14,lineHeight:1.7,color:'rgba(248,240,227,.8)',fontStyle:'italic'}}>"{mot||'Your journey starts now.'}"</p>}</div></div>
-
-        {/* Weight */}
-        <div style={{padding:'16px 20px 0'}}><div className="cd" style={{padding:24}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:20}}><div><p style={{fontSize:12,color:'rgba(255,255,255,.55)',letterSpacing:'.08em',marginBottom:6}}>CURRENT</p><p className="serif" style={{fontSize:38,lineHeight:1}}>{cw}<span style={{fontSize:16,color:'rgba(255,255,255,.55)'}}> {pro.unit}</span></p></div><div style={{textAlign:'right'}}><p style={{fontSize:12,color:'rgba(255,255,255,.55)',letterSpacing:'.08em',marginBottom:6}}>TO GO</p><p className="serif" style={{fontSize:28,color:'var(--ember)'}}>{Math.abs(cw-gw).toFixed(1)}<span style={{fontSize:14,color:'rgba(255,255,255,.55)'}}> {pro.unit}</span></p></div></div><MiniChart data={wh} width={320} height={70}/><div style={{display:'flex',gap:12,marginTop:16}}><div style={{flex:1,padding:'12px 0',textAlign:'center',background:'rgba(46,204,113,.06)',borderRadius:12,border:'1px solid rgba(46,204,113,.12)'}}><p style={{fontSize:18,fontWeight:700,color:'var(--success)'}}>-{Math.abs(lost)}</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Lost</p></div><div style={{flex:1,padding:'12px 0',textAlign:'center',background:'rgba(255,107,53,.06)',borderRadius:12,border:'1px solid rgba(255,107,53,.12)'}}><p style={{fontSize:18,fontWeight:700,color:'var(--ember)'}}>{pct}%</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Progress</p></div></div><button onClick={()=>{setMi({});setMd('weight')}} className="bp" style={{marginTop:16,padding:12,fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',gap:8}}><Ic d={P.scale} s={16} c="white"/> Log Weight</button></div></div>
-
-        {/* Log Grid */}
-        <div style={{padding:'16px 20px 0'}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}><h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)'}}>TODAY'S LOG</h3><button onClick={()=>{setMi({nt:notes});setMd('notes')}} style={{background:'none',border:'none',cursor:'pointer',color:'rgba(255,255,255,.55)',fontSize:12,fontFamily:"'Sora'",display:'flex',alignItems:'center',gap:4}}><Ic d={P.note} s={14} c="rgba(248,240,227,.4)"/> Notes</button></div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>{[{k:'water',v:dl.water,mx:8,u:'glasses',c:'#3498DB',p:P.water},{k:'cal',v:dl.calories,mx:2000,u:'kcal',c:'#E67E22',p:P.food},{k:'steps',v:dl.steps,mx:10000,u:'steps',c:'#2ECC71',p:P.target},{k:'sleep',v:dl.sleep,mx:9,u:'hrs',c:'#9B59B6',p:P.moon}].map((item,i)=>(<button key={i} className="cd" onClick={()=>{setMi({});setMd(item.k)}} style={{cursor:'pointer',padding:18,textAlign:'left',opacity:0,animation:'fadeUp .4s ease '+(0.15+i*0.08)+'s forwards'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}><Ic d={item.p} s={18} c={item.c}/><span style={{fontSize:11,color:'rgba(255,255,255,.4)'}}>{item.u}</span></div><p style={{fontSize:24,fontWeight:700,color:item.c}}>{typeof item.v==='number'&&item.v%1!==0?item.v.toFixed(1):item.v}</p><div style={{marginTop:8,height:4,borderRadius:2,background:'rgba(255,255,255,.06)'}}><div style={{height:'100%',borderRadius:2,background:item.c,width:Math.min(100,(item.v/item.mx)*100)+'%',transition:'width .5s'}}/></div><p style={{fontSize:11,color:'rgba(248,240,227,.25)',marginTop:6}}>Tap to edit</p></button>))}</div>
-        <div style={{display:'flex',gap:10,marginTop:12}}><button onClick={()=>{setMi({});setMd('food')}} className="cd" style={{flex:1,cursor:'pointer',padding:16,display:'flex',alignItems:'center',gap:10}}><Ic d={P.food} s={18} c="var(--ember)"/><div><p style={{fontWeight:600,fontSize:13}}>Log Food</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>AI analysis</p></div></button><button onClick={()=>{setMi({});setMd('exercise')}} className="cd" style={{flex:1,cursor:'pointer',padding:16,display:'flex',alignItems:'center',gap:10}}><Ic d={P.bolt} s={18} c="var(--flame)"/><div><p style={{fontWeight:600,fontSize:13}}>Exercise</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Track burns</p></div></button></div>
-        <button onClick={()=>{setMi({});setMd('meas')}} className="cd" style={{width:'100%',cursor:'pointer',padding:16,display:'flex',alignItems:'center',gap:10,marginTop:10}}><Ic d={P.ruler} s={18} c="#9B59B6"/><div><p style={{fontWeight:600,fontSize:13}}>Body Measurements</p><p style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Waist, chest, hips, arms, thighs</p></div></button></div>
-
-        {/* Quick Actions */}
-        <div style={{padding:'20px 20px 0'}}><div style={{display:'flex',gap:10,overflowX:'auto'}} className="noscroll">{[{l:'AI Meals',p:P.food,a:()=>go('meals')},{l:'Workout',p:P.bolt,a:()=>go('wkout')},{l:'Progress',p:P.chart,a:()=>go('prog')}].map((x,i)=>(<button key={i} onClick={x.a} style={{flexShrink:0,display:'flex',flexDirection:'column',alignItems:'center',gap:10,padding:'16px 20px',borderRadius:16,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.06)',cursor:'pointer',minWidth:85}}><div style={{width:40,height:40,borderRadius:12,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic d={x.p} s={18} c="white"/></div><span style={{fontSize:12,color:'rgba(248,240,227,.6)',fontFamily:"'Sora'",fontWeight:500}}>{x.l}</span></button>))}</div></div>
-
-        {fl.length>0&&<div style={{padding:'20px 20px 0'}}><h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)',marginBottom:12}}>FOOD LOG</h3>{fl.map((f,i)=>(<div key={i} className="cd" style={{padding:14,marginBottom:8,display:'flex',justifyContent:'space-between',alignItems:'center'}}><div><p style={{fontWeight:600,fontSize:14}}>{f.name}</p><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginTop:2}}>P:{f.protein} C:{f.carbs} F:{f.fat}</p></div><span className="tg" style={{background:'rgba(230,126,34,.15)',color:'#E67E22'}}>{f.calories}cal</span></div>))}</div>}
-      </div>)}
-
-      {/* ═══ AI COACH ═══ */}
-      {scr==='coach'&&(<div style={{height:'100vh',display:'flex',flexDirection:'column'}}><div style={{padding:'16px 20px',borderBottom:'1px solid rgba(255,255,255,.06)',display:'flex',alignItems:'center',gap:12}}><div style={{width:40,height:40,borderRadius:12,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic d={P.sparkle} s={20} c="white" f={true}/></div><div style={{flex:1}}><p style={{fontWeight:600,fontSize:16}}>Blaze</p><p style={{fontSize:12,color:'rgba(255,255,255,.55)'}}>Sees your full log & history</p></div></div><div style={{flex:1,overflowY:'auto',padding:20}} className="noscroll">{msgs.length===0&&(<div style={{textAlign:'center',padding:'20px 10px'}}><div style={{width:64,height:64,borderRadius:20,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}><Ic d={P.sparkle} s={28} c="white" f={true}/></div><h3 className="serif" style={{fontSize:22,marginBottom:8}}>Hey {pro.name}!</h3><p style={{color:'rgba(255,255,255,.6)',fontSize:14,lineHeight:1.6,marginBottom:24}}>I can see your full daily log, food intake, weight history, and more. Ask me anything — I'll give you specific advice based on YOUR data.</p><div style={{display:'flex',flexDirection:'column',gap:8}}>{['Review my day so far — how am I doing?','What should I eat for my next meal?','I'm craving something — help me pick smart','Give me a workout I can do right now','Help me build a weekly meal plan','I feel stuck — coach me through it'].map((q,i)=>(<button key={i} onClick={()=>{if(ciRef.current){ciRef.current.value=q;ciRef.current.focus();setCiBtn(true)}}} className="cd" style={{cursor:'pointer',textAlign:'left',padding:14,fontSize:14}}>{q}</button>))}</div></div>)}{msgs.map((m,i)=>(<div key={i} style={{display:'flex',justifyContent:m.r==='u'?'flex-end':'flex-start',marginBottom:12}}>{m.r==='a'&&<div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginRight:8,marginTop:4}}><Ic d={P.sparkle} s={14} c="white" f={true}/></div>}<div style={{maxWidth:'78%',padding:'12px 16px',borderRadius:m.r==='u'?'16px 16px 4px 16px':'16px 16px 16px 4px',background:m.r==='u'?'linear-gradient(135deg,var(--ember),var(--flame))':'rgba(255,255,255,.06)',fontSize:14,lineHeight:1.6}}>{m.t}</div></div>))}{cL&&<div style={{display:'flex',alignItems:'center',gap:6,padding:12}}><div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',marginRight:8}}><Ic d={P.sparkle} s={14} c="white" f={true}/></div>{[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:'50%',background:'var(--ember)',animation:'dotPulse 1.2s ease '+i*0.15+'s infinite'}}/>)}</div>}<div ref={chatEnd}/></div><div style={{padding:'12px 20px 90px',borderTop:'1px solid rgba(255,255,255,.06)',display:'flex',gap:10}}><input className="inf" placeholder="Ask Blaze anything..." ref={ciRef} onChange={e=>setCiBtn(e.target.value.trim().length>0)} onKeyDown={e=>e.key==='Enter'&&sendChat()} style={{flex:1}}/><button onClick={sendChat} disabled={!ciBtn||cL} style={{width:48,height:48,borderRadius:14,background:ciBtn?'linear-gradient(135deg,var(--ember),var(--flame))':'rgba(255,255,255,.05)',border:'none',cursor:ciBtn?'pointer':'default',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic d={P.send} s={18} c="white"/></button></div></div>)}
-
-      {/* ═══ MEALS ═══ */}
-      {scr==='meals'&&(<div style={{minHeight:'100vh',padding:24,paddingBottom:100}}><button onClick={()=>go('dash')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--bone)',display:'flex',alignItems:'center',gap:8,marginBottom:24,fontFamily:"'Sora'",fontSize:14}}><Ic d={P.back} s={18}/> Back</button><h2 className="serif" style={{fontSize:28,marginBottom:4}}>AI Meal Planner</h2><p style={{color:'rgba(255,255,255,.6)',marginBottom:20,fontSize:14}}>Personalized meals with macros</p><div style={{display:'flex',gap:10,marginBottom:16}}><input className="inf" type="number" placeholder="Max cal" style={{flex:1}} value={mi.mc2||''} onChange={e=>setMi(p=>({...p,mc2:e.target.value}))}/><input className="inf" placeholder="Preferences" style={{flex:1.5}} value={mi.mp2||''} onChange={e=>setMi(p=>({...p,mp2:e.target.value}))}/></div><button className="bp" onClick={async()=>{setMealL(true);setMealS(await AI.meal(mi.mc2||500,mi.mp2,fullCtx));setMealL(false)}} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:24}}><Ic d={P.sparkle} s={16} c="white" f={true}/> {mealL?'Generating...':'Generate Meal'}</button>{mealS&&(<div className="cd au" style={{padding:24,border:'1px solid rgba(255,107,53,.15)',marginBottom:20}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:14}}><h3 style={{fontSize:18,fontWeight:700,flex:1}}>{mealS.name}</h3><span className="tg" style={{background:'rgba(46,204,113,.15)',color:'#2ECC71',flexShrink:0}}>{mealS.calories} cal</span></div><p style={{fontSize:14,color:'rgba(248,240,227,.7)',lineHeight:1.6,marginBottom:14}}>{mealS.description}</p><div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}>{[{l:'P',v:mealS.protein},{l:'C',v:mealS.carbs},{l:'F',v:mealS.fat}].filter(n=>n.v).map((n,i)=>(<span key={i} className="tg" style={{background:'rgba(255,107,53,.1)',color:'var(--ember)'}}>{n.l}: {n.v}</span>))}</div><button onClick={()=>{setFl(p=>[...p,mealS]);setDl(p=>({...p,calories:p.calories+mealS.calories}));tt('Added!')}} className="bs">Add to Log</button></div>)}<button onClick={()=>{setMi({});setMd('food')}} className="cd" style={{width:'100%',cursor:'pointer',padding:20,display:'flex',alignItems:'center',gap:14}}><Ic d={P.edit} s={20} c="var(--ember)"/><div><p style={{fontWeight:600}}>Log Custom Food</p><p style={{fontSize:12,color:'rgba(255,255,255,.55)',marginTop:2}}>AI or manual</p></div></button></div>)}
-
-      {/* ═══ WORKOUT ═══ */}
-      {scr==='wkout'&&(<div style={{minHeight:'100vh',padding:24,paddingBottom:100}}><button onClick={()=>go('dash')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--bone)',display:'flex',alignItems:'center',gap:8,marginBottom:24,fontFamily:"'Sora'",fontSize:14}}><Ic d={P.back} s={18}/> Back</button><h2 className="serif" style={{fontSize:28,marginBottom:4}}>AI Workouts</h2><p style={{color:'rgba(255,255,255,.6)',marginBottom:20,fontSize:14}}>Fat-burning routines</p><div style={{display:'flex',gap:10,marginBottom:16}}><select className="inf" value={mi.wl||'moderate'} onChange={e=>setMi(p=>({...p,wl:e.target.value}))}><option value="beginner">Beginner</option><option value="moderate">Moderate</option><option value="advanced">Advanced</option></select><select className="inf" value={mi.wd||'20'} onChange={e=>setMi(p=>({...p,wd:e.target.value}))}><option value="10">10 min</option><option value="20">20 min</option><option value="30">30 min</option><option value="45">45 min</option></select></div><button className="bp" onClick={async()=>{setWkL(true);setWk(await AI.workout(mi.wl||'moderate',parseInt(mi.wd)||20,fullCtx));setWkL(false)}} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:24}}><Ic d={P.sparkle} s={16} c="white" f={true}/> {wkL?'Generating...':'Generate Workout'}</button>{wk&&<div className="au"><div className="cd" style={{padding:24,marginBottom:16,border:'1px solid rgba(255,107,53,.15)'}}><h3 style={{fontSize:20,fontWeight:700,marginBottom:8}}>{wk.name}</h3><div style={{display:'flex',gap:12}}><span className="tg" style={{background:'rgba(255,107,53,.1)',color:'var(--ember)'}}>{wk.duration} min</span><span className="tg" style={{background:'rgba(233,69,96,.1)',color:'var(--glow)'}}>~{wk.calories_est} cal</span></div></div>{(wk.exercises||[]).map((ex,i)=>(<div key={i} className="cd" style={{marginBottom:10,padding:18,display:'flex',alignItems:'center',gap:16,opacity:0,animation:'fadeUp .4s ease '+i*.1+'s forwards'}}><div style={{width:36,height:36,borderRadius:10,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:700,color:'white',flexShrink:0}}>{i+1}</div><div style={{flex:1}}><p style={{fontWeight:600,fontSize:15}}>{ex.name}</p><p style={{fontSize:13,color:'rgba(255,255,255,.6)',marginTop:2}}>{ex.reps} • Rest: {ex.rest}</p></div></div>))}<button onClick={()=>{setDl(p=>({...p,exercise:p.exercise+(wk.calories_est||0)}));tt('Workout logged! 🔥')}} className="bp" style={{marginTop:16}}>Log This Workout</button></div>}</div>)}
-
-      {/* ═══ PROGRESS ═══ */}
-      {scr==='prog'&&(<div style={{minHeight:'100vh',padding:24,paddingBottom:100}}><h2 className="serif" style={{fontSize:28,marginBottom:24}}>Your Progress</h2><div className="cd au" style={{textAlign:'center',padding:32,marginBottom:16,background:'linear-gradient(135deg,rgba(46,204,113,.06),rgba(255,107,53,.04))'}}><p style={{fontSize:13,color:'rgba(255,255,255,.55)',marginBottom:8}}>TOTAL SHED</p><p className="serif" style={{fontSize:56,color:'var(--success)',lineHeight:1}}>{Math.abs(lost)}<span style={{fontSize:20,color:'rgba(255,255,255,.55)'}}> {pro.unit}</span></p><div style={{marginTop:20,height:8,borderRadius:4,background:'rgba(255,255,255,.06)'}}><div className="aburn" style={{height:'100%',borderRadius:4,width:pct+'%'}}/></div><p style={{fontSize:13,color:'rgba(255,255,255,.55)',marginTop:12}}>{pct}% to goal</p></div><div className="cd" style={{padding:24,marginBottom:16}}><h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)',marginBottom:16}}>WEIGHT TREND</h3><MiniChart data={wh} width={300} height={100}/></div>{Object.values(meas).some(v=>v)&&<div className="cd" style={{padding:24,marginBottom:16}}><h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)',marginBottom:14}}>MEASUREMENTS</h3>{[{k:'waist',l:'Waist'},{k:'chest',l:'Chest'},{k:'hips',l:'Hips'},{k:'arms',l:'Arms'},{k:'thighs',l:'Thighs'}].filter(m=>meas[m.k]).map(m=>(<div key={m.k} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.04)'}}><span style={{color:'rgba(255,255,255,.6)'}}>{m.l}</span><span style={{fontWeight:600}}>{meas[m.k]} cm</span></div>))}</div>}<h3 style={{fontSize:14,fontWeight:600,color:'rgba(255,255,255,.6)',marginBottom:12}}>ACHIEVEMENTS</h3><div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>{[{n:'First Step',d:'Log weight',p:P.flame,c:'#FF6B35',done:wh.length>0},{n:'Week Warrior',d:'7-day streak',p:P.bolt,c:'#FF9F1C',done:streak>=7},{n:'Hydro Hero',d:'8 glasses',p:P.water,c:'#3498DB',done:dl.water>=8},{n:'5 Down',d:'Lose 5',p:P.trophy,c:'#2ECC71',done:Math.abs(lost)>=5},{n:'10K Steps',d:'10,000',p:P.target,c:'#E94560',done:dl.steps>=10000},{n:'Logger',d:'Log meal',p:P.food,c:'#E67E22',done:fl.length>0}].map((a,i)=>(<div key={i} className="cd" style={{textAlign:'center',padding:16,opacity:a.done?1:.35}}><div style={{width:40,height:40,borderRadius:12,margin:'0 auto 8px',background:a.done?'rgba(255,107,53,.1)':'rgba(255,255,255,.05)',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic d={a.p} s={20} c={a.c}/></div><p style={{fontSize:11,fontWeight:600}}>{a.n}</p><p style={{fontSize:10,color:'rgba(255,255,255,.55)'}}>{a.d}</p></div>))}</div></div>)}
-
-      {/* ═══ PROFILE ═══ */}
-      {scr==='prof'&&(<div style={{minHeight:'100vh',padding:24,paddingBottom:100}}><h2 className="serif" style={{fontSize:28,marginBottom:24}}>Profile</h2><div className="cd" style={{padding:24,marginBottom:16,display:'flex',alignItems:'center',gap:16}}><div style={{width:64,height:64,borderRadius:20,background:'linear-gradient(135deg,var(--ember),var(--flame))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,fontWeight:700}}>{(pro.name||'U')[0].toUpperCase()}</div><div><h3 style={{fontSize:18,fontWeight:700}}>{pro.name}</h3></div></div><div className="cd" style={{marginBottom:16}}>{[{l:'Weight',v:pro.currentWeight+' '+pro.unit},{l:'Goal',v:pro.goalWeight+' '+pro.unit},{l:'Height',v:pro.height+' '+pro.heightUnit},{l:'Activity',v:pro.activityLevel}].map((it,i)=>(<div key={i} style={{display:'flex',justifyContent:'space-between',padding:'14px 0',borderBottom:i<3?'1px solid rgba(255,255,255,.05)':'none'}}><span style={{fontSize:14,color:'rgba(255,255,255,.6)'}}>{it.l}</span><span style={{fontSize:14,fontWeight:500}}>{it.v}</span></div>))}</div><button onClick={()=>{DB.c();window.location.reload()}} className="bs" style={{color:'var(--glow)'}}>Reset All Data</button></div>)}
-
-      {/* NOTIFS */}
-      {notifs&&<div style={{position:'fixed',inset:0,zIndex:100}}><div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.6)'}} onClick={()=>setNotifs(false)}/><div className="au" style={{position:'relative',width:'100%',maxWidth:420,margin:'0 auto',background:'var(--coal)',borderRadius:'0 0 24px 24px',padding:24,maxHeight:'70vh',overflowY:'auto'}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:20}}><h3 style={{fontSize:18,fontWeight:700}}>Notifications</h3><button onClick={()=>setNotifs(false)} style={{background:'none',border:'none',cursor:'pointer',color:'var(--bone)'}}><Ic d={P.x} s={20}/></button></div>{[{t:'Weigh-in Reminder',m:'Time for your morning weigh-in!',tm:'8:00 AM',p:P.scale,c:'#FF6B35'},{t:'Water Check 💧',m:'Have you hit 8 glasses yet?',tm:'12:30 PM',p:P.water,c:'#3498DB'},{t:streak+'-Day Streak! 🔥',m:'Keep the chain going!',tm:'Yesterday',p:P.flame,c:'#FF9F1C'}].map((n,i)=>(<div key={i} className="cd" style={{marginBottom:12,padding:16,opacity:0,animation:'fadeUp .4s ease '+i*0.1+'s forwards'}}><div style={{display:'flex',gap:12}}><div style={{width:36,height:36,borderRadius:10,background:'rgba('+parseInt(n.c.slice(1,3),16)+','+parseInt(n.c.slice(3,5),16)+','+parseInt(n.c.slice(5,7),16)+',.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Ic d={n.p} s={18} c={n.c}/></div><div><p style={{fontWeight:600,fontSize:14,marginBottom:4}}>{n.t}</p><p style={{fontSize:13,color:'rgba(248,240,227,.6)',lineHeight:1.5}}>{n.m}</p><p style={{fontSize:11,color:'rgba(255,255,255,.4)',marginTop:6}}>{n.tm}</p></div></div></div>))}</div></div>}
-
-      {/* TAB BAR */}
-      {showTabs&&(<div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:50,background:'rgba(26,26,46,.95)',backdropFilter:'blur(20px)',borderTop:'1px solid rgba(255,255,255,.06)',display:'flex',justifyContent:'space-around',padding:'8px 0 24px',maxWidth:480,margin:'0 auto'}}>{tabs.map(t=>(<button key={t.id} onClick={()=>go(t.id)} style={{background:'none',border:'none',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:4,padding:'8px 16px',color:scr===t.id?'var(--ember)':'rgba(248,240,227,.3)'}}><Ic d={t.p} s={22} c={scr===t.id?'var(--ember)':'rgba(248,240,227,.3)'} f={t.p===P.sparkle}/><span style={{fontSize:10,fontWeight:scr===t.id?600:400,fontFamily:"'Sora'"}}>{t.l}</span></button>))}</div>)}
+  return (
+    <div style={{ padding: "1rem" }}>
+      <h2 style={{ margin: "0 0 4px" }}>Training programme</h2>
+      <p style={{ margin: "0 0 1rem", fontSize: "13px", color: "var(--color-text-secondary)" }}>
+        {profile.trainingDays}×/week · {profile.equipment} · 12-week hypertrophy + strength
+      </p>
+      <Btn onClick={gen} disabled={loading} full>
+        <i className="ti ti-barbell" aria-hidden style={{ marginRight: "6px", verticalAlign: "-1px" }}></i>
+        {result ? "Regenerate plan" : "Generate my 12-week plan"}
+      </Btn>
+      {loading && <div style={{ marginTop: "14px" }}><Spinner /></div>}
+      {result && <div style={{ marginTop: "12px" }}><AIOut text={result} /></div>}
     </div>
   );
 }
 
-ReactDOM.render(React.createElement(App), document.getElementById('root'));
-</script>
-</body>
-</html>
+// ─── TAB 2: MACROS ───────────────────────────────────────────────
+function MacrosTab({ profile, macros }) {
+  const { protein, carbs, fat, target } = macros;
+  const total = protein * 4 + carbs * 4 + fat * 9;
+  const pPct = Math.round(protein * 4 / total * 100);
+  const cPct = Math.round(carbs * 4 / total * 100);
+  const fPct = 100 - pPct - cPct;
+  const goalLabel = { cut: "Aggressive cut", bulk: "Lean bulk", recomp: "Recomp" }[profile.goal];
+
+  const bars = [
+    ["Protein", protein, pPct, "#1D9E75"],
+    ["Carbs",   carbs,   cPct, "#378ADD"],
+    ["Fat",     fat,     fPct, "#D85A30"],
+  ];
+
+  return (
+    <div style={{ padding: "1rem" }}>
+      <h2 style={{ margin: "0 0 1rem" }}>Daily macros</h2>
+
+      <Card accent>
+        <div style={{ textAlign: "center", padding: "0.25rem 0 0.5rem" }}>
+          <div style={{ fontSize: "11px", color: "var(--color-text-secondary)", letterSpacing: "0.5px", marginBottom: "6px" }}>
+            {goalLabel.toUpperCase()} · DAILY TARGET
+          </div>
+          <div style={{ fontSize: "56px", fontWeight: 500, lineHeight: 1, color: ACCENT }}>{target}</div>
+          <div style={{ fontSize: "13px", color: "var(--color-text-secondary)", marginBottom: "1rem" }}>kcal / day</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px", paddingTop: "12px", borderTop: "0.5px solid var(--color-border-tertiary)" }}>
+            {[["Floor", macros.floor], ["Target", target], ["Ceiling", macros.ceiling]].map(([l, v]) => (
+              <div key={l}>
+                <div style={{ fontSize: "10px", color: "var(--color-text-secondary)", marginBottom: "2px" }}>{l}</div>
+                <div style={{ fontWeight: 500, fontSize: "14px" }}>{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div style={{ fontWeight: 500, marginBottom: "14px" }}>Macro breakdown</div>
+        {bars.map(([label, grams, pct, col]) => (
+          <div key={label} style={{ marginBottom: "14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "5px" }}>
+              <span style={{ fontWeight: 500 }}>{label}</span>
+              <span style={{ color: "var(--color-text-secondary)" }}>{grams}g &nbsp;·&nbsp; {pct}%</span>
+            </div>
+            <div style={{ background: "var(--color-background-secondary)", borderRadius: "3px", height: "5px" }}>
+              <div style={{ width: `${pct}%`, background: col, height: "100%", borderRadius: "3px" }} />
+            </div>
+          </div>
+        ))}
+      </Card>
+
+      <Card>
+        <div style={{ fontWeight: 500, marginBottom: "12px" }}>Body stats</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "8px" }}>
+          {[
+            ["Lean body mass", `${macros.lbm} kg`],
+            ["BMR",           `${macros.bmr} kcal`],
+            ["TDEE",          `${macros.tdee} kcal`],
+            ["Daily deficit", `${macros.tdee - target} kcal`],
+          ].map(([l, v]) => (
+            <div key={l} style={{ background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "10px 12px" }}>
+              <div style={{ fontSize: "11px", color: "var(--color-text-secondary)", marginBottom: "2px" }}>{l}</div>
+              <div style={{ fontWeight: 500, fontSize: "15px" }}>{v}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: "12px", padding: "10px 12px", background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", fontSize: "12px", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+          <strong style={{ color: "var(--color-text-primary)" }}>Training days</strong> — eat at ceiling ({macros.ceiling} kcal).<br />
+          <strong style={{ color: "var(--color-text-primary)" }}>Rest days</strong> — eat at floor ({macros.floor} kcal).
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ─── HAWKER DATABASE ─────────────────────────────────────────────
+function HawkerSearch({ onBack }) {
+  const [q, setQ] = useState("");
+  const [cat, setCat] = useState("All");
+
+  const shown = DB.filter(d =>
+    (!q || d.name.toLowerCase().includes(q.toLowerCase())) &&
+    (cat === "All" || d.cat === cat)
+  );
+
+  return (
+    <div style={{ padding: "1rem" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "1rem" }}>
+        <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", padding: "4px" }}>
+          <i className="ti ti-arrow-left" style={{ fontSize: "18px" }} aria-label="Back"></i>
+        </button>
+        <h2 style={{ margin: 0, fontSize: "18px" }}>Hawker database</h2>
+      </div>
+
+      <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search 110+ dishes..." style={{ width: "100%", boxSizing: "border-box", marginBottom: "10px" }} />
+
+      <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "8px", marginBottom: "8px", scrollbarWidth: "none" }}>
+        {CATS.map(c => <Chip key={c} active={cat === c} onClick={() => setCat(c)}>{c}</Chip>)}
+      </div>
+
+      <div style={{ fontSize: "11px", color: "var(--color-text-secondary)", marginBottom: "10px" }}>{shown.length} dishes</div>
+
+      {shown.map(d => (
+        <div key={d.id} style={{
+          background: "var(--color-background-primary)",
+          border: "0.5px solid var(--color-border-tertiary)",
+          borderRadius: "var(--border-radius-md)",
+          padding: "10px 12px", marginBottom: "6px",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 500, fontSize: "13px" }}>{d.name}</div>
+              <div style={{ fontSize: "11px", color: "var(--color-text-secondary)", marginTop: "1px" }}>{d.cat}</div>
+            </div>
+            <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <div style={{ fontWeight: 500, fontSize: "16px", color: ACCENT }}>{d.cal}</div>
+              <div style={{ fontSize: "10px", color: "var(--color-text-secondary)" }}>kcal</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: "12px", marginTop: "7px" }}>
+            {[["P", d.p, "#1D9E75"], ["C", d.c, "#378ADD"], ["F", d.f, "#D85A30"]].map(([l, v, col]) => (
+              <span key={l} style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
+                <span style={{ color: col, fontWeight: 600 }}>{l}</span> {v}g
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── TAB 3: MEALS ────────────────────────────────────────────────
+function MealsTab({ profile, macros }) {
+  const [view, setView] = useState("main");
+  const [foods, setFoods] = useState("");
+  const [mealType, setMealType] = useState("home");
+  const [cookTime, setCookTime] = useState("30");
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  if (view === "hawker") return <HawkerSearch onBack={() => setView("main")} />;
+
+  const gen = async () => {
+    setLoading(true); setResult("");
+    const txt = await askClaude(
+      "You are a Singapore-based sports nutritionist. Practical, specific. Always show P/C/F/kcal per meal. Hawker mode: recommend real SG dishes by name (e.g. yong tau foo, ban mian). Home mode: fast, simple recipes.",
+      `7-day meal plan for ${profile.name} in Singapore.
+Daily targets: ${macros.target} kcal · Protein ${macros.protein}g · Carbs ${macros.carbs}g · Fat ${macros.fat}g.
+Style: ${mealType === "home" ? "home-cooked, max " + cookTime + " min prep" : "eating out at hawker centres and kopitiams"}.
+${foods ? "Preferred foods: " + foods + "." : ""}
+Goal: ${profile.goal === "cut" ? "fat loss while preserving muscle" : profile.goal}.
+Format: Day 1 through Day 7 with Breakfast, Lunch, Dinner, Snack and macro totals per day.
+End with a Grab-and-Go snack list of 6 items for busy days. Keep each meal under 2 lines.`, 1500
+    );
+    setResult(txt); setLoading(false);
+  };
+
+  return (
+    <div style={{ padding: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <h2 style={{ margin: 0 }}>Meal plan</h2>
+        <button onClick={() => setView("hawker")} style={{
+          background: "none", border: "0.5px solid var(--color-border-secondary)",
+          borderRadius: "var(--border-radius-md)", padding: "6px 11px",
+          fontSize: "12px", cursor: "pointer", color: "var(--color-text-primary)",
+        }}>
+          <i className="ti ti-search" style={{ fontSize: "12px", verticalAlign: "-1px", marginRight: "4px" }} aria-hidden></i>
+          Hawker DB
+        </button>
+      </div>
+
+      <Card>
+        <div style={{ marginBottom: "12px" }}>
+          <SectionLabel>Meal style</SectionLabel>
+          <div style={{ display: "flex", gap: "6px" }}>
+            <Chip active={mealType === "home"} onClick={() => setMealType("home")}>Home cook</Chip>
+            <Chip active={mealType === "hawker"} onClick={() => setMealType("hawker")}>Hawker / eat out</Chip>
+          </div>
+        </div>
+
+        {mealType === "home" && (
+          <div style={{ marginBottom: "12px" }}>
+            <SectionLabel>Max cook time</SectionLabel>
+            <div style={{ display: "flex", gap: "6px" }}>
+              {["20", "30", "45"].map(t => <Chip key={t} active={cookTime === t} onClick={() => setCookTime(t)}>{t} min</Chip>)}
+            </div>
+          </div>
+        )}
+
+        <div style={{ marginBottom: "14px" }}>
+          <SectionLabel>Preferred foods (optional)</SectionLabel>
+          <input value={foods} onChange={e => setFoods(e.target.value)} placeholder="chicken, salmon, tofu, eggs..." style={{ width: "100%", boxSizing: "border-box" }} />
+        </div>
+
+        <Btn onClick={gen} disabled={loading} full>
+          {loading ? "Generating..." : "Generate 7-day meal plan"}
+        </Btn>
+      </Card>
+
+      {loading && <Spinner />}
+      {result && <AIOut text={result} />}
+    </div>
+  );
+}
+
+// ─── TAB 4: FORM AUDIT ───────────────────────────────────────────
+function FormTab({ profile }) {
+  const [exercise, setExercise] = useState("");
+  const [sensation, setSensation] = useState("");
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const quick = ["Barbell Squat", "Deadlift", "Bench Press", "Shoulder Press", "Barbell Row", "Lat Pulldown", "Hip Thrust", "Lunges"];
+
+  const gen = async () => {
+    setLoading(true); setResult("");
+    const txt = await askClaude(
+      "You are a strength coach and movement specialist. Practical, actionable. Sections: Form breakdowns, Mobility drills (with sets/reps/duration), Coaching cues. Never suggest seeing a doctor unless truly necessary.",
+      `${profile.name} (${profile.weight}kg, ${profile.height}cm) feels "${sensation}" when performing ${exercise}.
+1. The 3 most common form breakdown points that cause this exact sensation.
+2. 2 specific mobility drills to do before the set — state muscle targeted, reps, and hold duration.
+3. 3 coaching cues to internalise during the lift.`, 900
+    );
+    setResult(txt); setLoading(false);
+  };
+
+  return (
+    <div style={{ padding: "1rem" }}>
+      <h2 style={{ margin: "0 0 1rem" }}>Form audit</h2>
+      <Card>
+        <div style={{ marginBottom: "12px" }}>
+          <SectionLabel>Exercise</SectionLabel>
+          <input value={exercise} onChange={e => setExercise(e.target.value)} placeholder="e.g. Barbell Squat" style={{ width: "100%", boxSizing: "border-box", marginBottom: "8px" }} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+            {quick.map(e => <Chip key={e} active={exercise === e} onClick={() => setExercise(e)}>{e}</Chip>)}
+          </div>
+        </div>
+        <div style={{ marginBottom: "14px" }}>
+          <SectionLabel>What do you feel?</SectionLabel>
+          <input value={sensation} onChange={e => setSensation(e.target.value)} placeholder="tightness in hips, lower back pain, knee cave..." style={{ width: "100%", boxSizing: "border-box" }} />
+        </div>
+        <Btn onClick={gen} disabled={loading || !exercise || !sensation} full>
+          {loading ? "Auditing..." : "Audit my form"}
+        </Btn>
+      </Card>
+      {loading && <Spinner />}
+      {result && <AIOut text={result} />}
+    </div>
+  );
+}
+
+// ─── TAB 5: FINISHER ─────────────────────────────────────────────
+function FinisherTab({ profile }) {
+  const [dayType, setDayType] = useState("push");
+  const [format, setFormat] = useState("emom");
+  const [equip, setEquip] = useState(profile.equipment);
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const gen = async () => {
+    setLoading(true); setResult("");
+    const txt = await askClaude(
+      "You are a metabolic conditioning specialist. Design precise 15-minute finishers that spike EPOC for 24 hours without impairing muscle recovery. Always show the timer structure clearly.",
+      `Design a 15-minute ${format.toUpperCase()} finisher for ${profile.name} after a ${dayType} session.
+Equipment: ${equip}. Bodyweight: ${profile.weight}kg.
+Goal: maximum fat oxidation post-session, preserve muscle.
+Include: exact timer structure, exercise names with rep/time counts, one scaling option for beginners, and a 2-sentence explanation of why this creates the 24-hr metabolic spike.`, 900
+    );
+    setResult(txt); setLoading(false);
+  };
+
+  return (
+    <div style={{ padding: "1rem" }}>
+      <h2 style={{ margin: "0 0 1rem" }}>Metabolic finisher</h2>
+      <Card>
+        <div style={{ marginBottom: "12px" }}>
+          <SectionLabel>Session type</SectionLabel>
+          <div style={{ display: "flex", gap: "6px" }}>
+            {[["push", "Push"], ["pull", "Pull"], ["legs", "Legs"]].map(([v, l]) => (
+              <Chip key={v} active={dayType === v} onClick={() => setDayType(v)}>{l}</Chip>
+            ))}
+          </div>
+        </div>
+        <div style={{ marginBottom: "12px" }}>
+          <SectionLabel>Format</SectionLabel>
+          <div style={{ display: "flex", gap: "6px" }}>
+            <Chip active={format === "emom"} onClick={() => setFormat("emom")}>EMOM</Chip>
+            <Chip active={format === "tabata"} onClick={() => setFormat("tabata")}>Tabata</Chip>
+          </div>
+        </div>
+        <div style={{ marginBottom: "14px" }}>
+          <SectionLabel>Equipment available</SectionLabel>
+          <select value={equip} onChange={e => setEquip(e.target.value)} style={{ width: "100%" }}>
+            <option value="gym">Full gym</option>
+            <option value="condo">Condo gym (basic)</option>
+            <option value="hdb">HDB gym (minimal)</option>
+            <option value="home">Bodyweight only</option>
+          </select>
+        </div>
+        <Btn onClick={gen} disabled={loading} full>
+          {loading ? "Building..." : "Build my finisher"}
+        </Btn>
+      </Card>
+      {loading && <Spinner />}
+      {result && <AIOut text={result} />}
+    </div>
+  );
+}
+
+// ─── TAB 6: COACH ────────────────────────────────────────────────
+function CoachTab({ profile, macros }) {
+  const [checkins, setCheckins] = useState([]);
+  const [form, setForm] = useState({ weight: "", lifts: "", energy: "7", notes: "" });
+  const [analysis, setAnalysis] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showHist, setShowHist] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => { loadSt("shed_checkins_v2").then(d => { if (d) setCheckins(d); }); }, []);
+
+  const saveCheckin = async () => {
+    if (!form.weight || !form.lifts) return;
+    const entry = { ...form, date: new Date().toLocaleDateString("en-SG", { day: "2-digit", month: "short" }), week: checkins.length + 1, ts: Date.now() };
+    const updated = [...checkins, entry];
+    setCheckins(updated);
+    await saveSt("shed_checkins_v2", updated);
+    setForm({ weight: "", lifts: "", energy: "7", notes: "" });
+    setSaved(true); setTimeout(() => setSaved(false), 2000);
+  };
+
+  const getCoaching = async () => {
+    if (checkins.length === 0) return;
+    setLoading(true); setAnalysis("");
+    const hist = checkins.map(c =>
+      `Week ${c.week} (${c.date}): ${c.weight}kg | lifts: ${c.lifts} | energy: ${c.energy}/10${c.notes ? " | " + c.notes : ""}`
+    ).join("\n");
+    const txt = await askClaude(
+      `You are ${profile.name}'s head transformation coach. Be blunt and direct. End every response with a single clear directive in caps: REFEED NOW / HOLD THE LINE / CUT HARDER / ADD CALORIES — and state exactly what changes in numbers.`,
+      `Coach, here's my progress. Starting weight: ~${profile.weight}kg. Goal: ${profile.goal}. Daily targets: ${macros.target} kcal, ${macros.protein}g protein.
+
+Weekly check-ins:
+${hist}
+
+What happened, why, and what do I do differently this week?`, 800
+    );
+    setAnalysis(txt); setLoading(false);
+  };
+
+  const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const idx = (() => {
+    if (checkins.length < 2) return null;
+    const last = checkins[checkins.length - 1];
+    const prev = checkins[checkins.length - 2];
+    const delta = +(+last.weight - +prev.weight).toFixed(1);
+    const en = +last.energy;
+    return {
+      scaleArrow: delta < -0.3 ? "↓" : delta > 0.3 ? "↑" : "→",
+      scaleSub: delta < -0.3 ? `${Math.abs(delta)}kg lost` : delta > 0.3 ? `${delta}kg up` : "Stable",
+      scaleGood: delta < -0.1,
+      energyArrow: en >= 7 ? "↑" : en >= 5 ? "→" : "↓",
+      energySub: en >= 7 ? "High" : en >= 5 ? "Moderate" : "Fatigued",
+      energyGood: en >= 6,
+    };
+  })();
+
+  return (
+    <div style={{ padding: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <h2 style={{ margin: 0 }}>My coach</h2>
+        {checkins.length > 0 && (
+          <button onClick={() => setShowHist(h => !h)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", fontSize: "12px" }}>
+            {showHist ? "Hide history" : `${checkins.length} check-ins`}
+          </button>
+        )}
+      </div>
+
+      {idx && (
+        <Card accent>
+          <SectionLabel>SHED Index — Week {checkins.length}</SectionLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "8px", textAlign: "center" }}>
+            {[
+              ["Scale",    idx.scaleArrow,  idx.scaleSub,  idx.scaleGood],
+              ["Strength", "→",             "Tracking",    true],
+              ["Energy",   idx.energyArrow, idx.energySub, idx.energyGood],
+            ].map(([label, arrow, sub, good]) => (
+              <div key={label} style={{ background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "10px 4px" }}>
+                <div style={{ fontSize: "10px", color: "var(--color-text-secondary)", marginBottom: "3px" }}>{label.toUpperCase()}</div>
+                <div style={{ fontSize: "28px", fontWeight: 500, color: good ? ACCENT : "#D85A30", lineHeight: 1 }}>{arrow}</div>
+                <div style={{ fontSize: "10px", color: "var(--color-text-secondary)", marginTop: "3px" }}>{sub}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: "10px", textAlign: "center", fontSize: "12px", color: "var(--color-text-secondary)" }}>
+            <i className="ti ti-flame" style={{ color: ACCENT, marginRight: "4px", verticalAlign: "-1px" }} aria-hidden></i>
+            {checkins.length}-week check-in streak
+          </div>
+        </Card>
+      )}
+
+      <Card>
+        <div style={{ fontWeight: 500, marginBottom: "14px" }}>Week {checkins.length + 1} check-in</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "10px", marginBottom: "10px" }}>
+          <div>
+            <SectionLabel>Weight (kg)</SectionLabel>
+            <input type="number" step="0.1" value={form.weight} onChange={e => u("weight", e.target.value)} placeholder="74.5" style={{ width: "100%", boxSizing: "border-box" }} />
+          </div>
+          <div>
+            <SectionLabel>Energy (1–10)</SectionLabel>
+            <input type="number" min="1" max="10" value={form.energy} onChange={e => u("energy", e.target.value)} style={{ width: "100%", boxSizing: "border-box" }} />
+          </div>
+        </div>
+        <div style={{ marginBottom: "10px" }}>
+          <SectionLabel>Best lifts this week</SectionLabel>
+          <input value={form.lifts} onChange={e => u("lifts", e.target.value)} placeholder="Bench 60kg×8, Squat 80kg×6..." style={{ width: "100%", boxSizing: "border-box" }} />
+        </div>
+        <div style={{ marginBottom: "14px" }}>
+          <SectionLabel>Notes (optional)</SectionLabel>
+          <input value={form.notes} onChange={e => u("notes", e.target.value)} placeholder="Hari Raya dinner, bad sleep, travel..." style={{ width: "100%", boxSizing: "border-box" }} />
+        </div>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Btn ghost onClick={saveCheckin} disabled={!form.weight || !form.lifts}>
+            <i className="ti ti-device-floppy" style={{ fontSize: "13px", verticalAlign: "-1px", marginRight: "4px" }} aria-hidden></i>
+            {saved ? "Saved!" : "Save"}
+          </Btn>
+          <Btn onClick={getCoaching} disabled={loading || checkins.length === 0} full>
+            {loading ? "Analysing..." : "Get coaching →"}
+          </Btn>
+        </div>
+        {checkins.length === 0 && (
+          <div style={{ marginTop: "10px", fontSize: "12px", color: "var(--color-text-secondary)", textAlign: "center" }}>
+            Save your first check-in to unlock coaching.
+          </div>
+        )}
+      </Card>
+
+      {showHist && checkins.length > 0 && (
+        <Card>
+          <div style={{ fontWeight: 500, marginBottom: "12px" }}>Check-in history</div>
+          {[...checkins].reverse().map((c, i, arr) => (
+            <div key={i} style={{ paddingBottom: "10px", marginBottom: "10px", borderBottom: i < arr.length - 1 ? "0.5px solid var(--color-border-tertiary)" : "none" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
+                <span style={{ fontWeight: 500, fontSize: "13px" }}>Week {c.week} · {c.date}</span>
+                <span style={{ color: ACCENT, fontWeight: 500, fontSize: "14px" }}>{c.weight}kg</span>
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
+                Energy {c.energy}/10 · {c.lifts}
+              </div>
+              {c.notes && <div style={{ fontSize: "11px", color: "var(--color-text-secondary)", marginTop: "2px", fontStyle: "italic" }}>{c.notes}</div>}
+            </div>
+          ))}
+        </Card>
+      )}
+
+      {loading && <Spinner />}
+      {analysis && <AIOut text={analysis} />}
+    </div>
+  );
+}
+
+// ─── ROOT APP ────────────────────────────────────────────────────
+const TABS = [
+  { id: "programme", icon: "ti-barbell",   label: "Plan"     },
+  { id: "macros",    icon: "ti-calculator",label: "Macros"   },
+  { id: "meals",     icon: "ti-bowl",       label: "Meals"    },
+  { id: "form",      icon: "ti-activity",   label: "Form"     },
+  { id: "finisher",  icon: "ti-flame",      label: "Burn"     },
+  { id: "coach",     icon: "ti-chart-line", label: "Coach"    },
+];
+
+export default function SHED() {
+  const [profile, setProfile] = useState(null);
+  const [tab, setTab] = useState("macros");
+  const [editProfile, setEditProfile] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    loadSt("shed_profile_v2").then(d => {
+      if (d) setProfile(d);
+      setReady(true);
+    });
+  }, []);
+
+  const saveProfile = async (p) => {
+    setProfile(p);
+    await saveSt("shed_profile_v2", p);
+    setEditProfile(false);
+  };
+
+  if (!ready) return (
+    <div style={{ padding: "40px", textAlign: "center", color: "var(--color-text-secondary)" }}>
+      <i className="ti ti-loader" style={{ fontSize: "24px" }} aria-hidden></i>
+    </div>
+  );
+
+  if (!profile || editProfile) return (
+    <ProfileSetup
+      onDone={saveProfile}
+      existing={editProfile ? profile : null}
+      onBack={editProfile ? () => setEditProfile(false) : null}
+    />
+  );
+
+  const macros = calcMacros(profile);
+
+  const renderTab = () => {
+    switch (tab) {
+      case "programme": return <ProgrammeTab profile={profile} />;
+      case "macros":    return <MacrosTab profile={profile} macros={macros} />;
+      case "meals":     return <MealsTab profile={profile} macros={macros} />;
+      case "form":      return <FormTab profile={profile} />;
+      case "finisher":  return <FinisherTab profile={profile} />;
+      case "coach":     return <CoachTab profile={profile} macros={macros} />;
+      default:          return null;
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "600px", maxWidth: "420px", margin: "0 auto", fontFamily: "var(--font-sans)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 1rem 8px", borderBottom: "0.5px solid var(--color-border-tertiary)" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+          <span style={{ fontWeight: 500, fontSize: "16px", color: ACCENT, letterSpacing: "-0.5px" }}>SHED</span>
+          <span style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>{profile.name}</span>
+        </div>
+        <button onClick={() => setEditProfile(true)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", padding: "4px" }}>
+          <i className="ti ti-settings" style={{ fontSize: "16px" }} aria-label="Edit profile"></i>
+        </button>
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto" }}>
+        {renderTab()}
+      </div>
+
+      <div style={{
+        display: "grid", gridTemplateColumns: "repeat(6, 1fr)",
+        borderTop: "0.5px solid var(--color-border-tertiary)",
+        background: "var(--color-background-primary)",
+        position: "sticky", bottom: 0,
+      }}>
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            padding: "8px 2px 6px", background: "none", border: "none", cursor: "pointer",
+            borderTop: tab === t.id ? `2px solid ${ACCENT}` : "2px solid transparent",
+            transition: "border-color 0.15s",
+          }}>
+            <i className={`ti ${t.icon}`} style={{ fontSize: "18px", color: tab === t.id ? ACCENT : "var(--color-text-secondary)" }} aria-hidden></i>
+            <span style={{ fontSize: "9px", marginTop: "3px", color: tab === t.id ? ACCENT : "var(--color-text-secondary)", fontWeight: tab === t.id ? 500 : 400 }}>{t.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
